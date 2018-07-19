@@ -5,7 +5,7 @@ const configDB 		= require('./../../../config').mongodb
 const assert 		= require('assert')
 
 MongoClient.connect(configDB.url, function(err, client){
-	console.log('Established Database Connection: ' + configDB.url + ' ' + configDB.db)
+	console.log('Established Database Connection: ', configDB)
 	console.log('\nReading Data:')
 
 	if(data.length <= 0)
@@ -13,7 +13,7 @@ MongoClient.connect(configDB.url, function(err, client){
 
 	console.log('Season Data Count: ' + data.length + '\n\n' + 'Data:')
 	data.forEach((seasonData) => {
-		console.log(seasonData._id.season + ' ' + seasonData._id.first + ' ' + seasonData.name)
+		console.log(seasonData._id, seasonData.name)
 	})
 
 	assert.equal(null, err)
@@ -32,7 +32,7 @@ function saveSeasonData(seasonData, db){
 		db.collection('seasons').save(seasonData[0], (err, result) => {
 			if(err)
 				console.log(err)
-			console.log(seasonData[0]._id.season + ' ' + seasonData[0]._id.first + ' ' + seasonData[0].name)
+			console.log(seasonData[0]._id, seasonData[0].name)
 			console.log(result.result)
 			seasonData.shift()
 		})
