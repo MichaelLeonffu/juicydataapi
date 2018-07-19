@@ -13,6 +13,7 @@ app.get('/api/version', (req, res) => {
 //Connecting all APIs
 
 require('./accounts/accountsapi')(config, app, db)
+require('./events/eventsapi')(config, app, db)
 
 app.get('/api/teapot', (req, res) => {
 	res.status(418).send('I\'m a teapot')
