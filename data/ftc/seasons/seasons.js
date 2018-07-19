@@ -1,9 +1,42 @@
 //seasons by Michael Leonffu
 
-var MongoClient = require('mongodb').MongoClient	//CHANGE
-var url = "mongodb://localhost:27017"	//CHANGE
+const MongoClient 	= require('mongodb').MongoClient
+const configDB 		= require('./../../../config').mongodb
+const assert 		= require('assert')
 
-//use config there;
+MongoClient.connect(configDB.url, function(err, client){
+	console.log('Established Database Connection: ' + configDB.url + ' ' + configDB.db)
+	console.log('\nReading Data:')
+
+	if(data.length <= 0)
+		console.log('No season data found!')			//should end here
+
+	console.log('Season Data Count: ' + data.length + '\n\n' + 'Data:')
+	data.forEach((seasonData) => {
+		console.log(seasonData._id.season + ' ' + seasonData._id.first + ' ' + seasonData.name)
+	})
+
+	assert.equal(null, err)
+	var db = client.db(configDB.db)
+
+	console.log('\nStarting Upload: ')
+	saveSeasonData(data, db)
+
+	client.close()
+})
+
+function saveSeasonData(seasonData, db){
+	if(seasonData.length <= 0)
+		return
+	else
+		db.collection('seasons').save(seasonData[0], (err, result) => {
+			if(err)
+				console.log(err)
+			console.log(seasonData[0]._id.season + ' ' + seasonData[0]._id.first + ' ' + seasonData[0].name)
+			console.log(result.result)
+			seasonData.shift()
+		})
+}
 
 // [
 // 	{
@@ -34,7 +67,7 @@ var url = "mongodb://localhost:27017"	//CHANGE
 
 //add all known data for seasons here in order to init it into db
 
-const data:[
+const data = [
 	{
 		_id:{
 			season: '2017-2018',
