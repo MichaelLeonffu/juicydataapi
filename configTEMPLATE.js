@@ -12,5 +12,15 @@ module.exports = {
 	},
 	jwt:{
 		key: 'secret'
-	}
+	},
+	permissions:[	//Add more permissions this way or change exsisting permissions
+		{
+			group: 'admin',
+			permissionLevel: 4.0
+		},
+		{
+			group: 'default',
+			permissionLevel: 0.0
+		}
+	]
 }
