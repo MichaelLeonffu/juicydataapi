@@ -1,4 +1,4 @@
-//in collection 'season'
+//in collection 'seasons'
 {
 	_id:{
 		season: 'abc',			//as 2017-2018
@@ -240,7 +240,7 @@
 	]
 }
 
-//in collection 'ranking'
+//in collection 'rankings'
 {
 	_id: 'abc',								//eventKey
 	lastUpdated: ISODate(), 				//Time of insert/update
@@ -315,6 +315,24 @@
 //in collection 'predictions'
 {
 	//UNDER CONSTRUCTION; predicts similarly as algorhithm in stats; via differnt allgorithms per each amtch
+}
+
+//in collection 'apiKeys'
+{
+	_id:{
+		//still under development
+	},
+	metadata:{
+		permissionLevel: 123,		//dictates the permissions required to edit this data
+		archive: false,				//if true then only admins and mods can view
+		log:{
+			creator: ObjectId(), 	//IMMUTABLE mongodb unique id of user
+			lastEditor: ObjectId(), //mongodb unique id of user
+			birthTime: ISODate(),	//IMMUTABLE time of insertion
+			lastUpdated: ISODate() 	//time of update
+		}
+	},
+	key: 'abc'	//the key itself
 }
 
 //in collection 'teams'
