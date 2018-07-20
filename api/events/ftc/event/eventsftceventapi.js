@@ -102,41 +102,26 @@ app.get('/api/events/ftc/event/uploadSync', (req, res) => {		//change this to po
 	// 			}
 	// 		],
 	// 		matchData:[
-	// 			matchInformation:{
-	// 				matchNumber: 123,
-	// 				teams: {
-	// 					red1: 123,
-	// 					red2: 123,
-	// 					blue1: 123,
-	// 					blue2: 123
-	// 				}
-	// 			},
-	// 			resultInformation:{
-	// 				winner: 'abc', 	//'blue', 'red', 'tie'				//IFFY
-	// 				score:{
-	// 					auto:{
-	// 						red: 123, //red alliance autonomous score
-	// 						blue: 123 //blue alliance autonomous score
-	// 					},
-	// 					driver:{
-	// 						red: 123, //red alliance tele-op score
-	// 						blue: 123 //blue alliance tele-op score
-	// 					},
-	// 					end:{
-	// 						red: 123, //red alliance end-game score
-	// 						blue: 123 //blue alliance end-game score
-	// 					},
-	// 					total:{
-	// 						red: 123, //red alliance total score
-	// 						blue: 123 //blue alliance total score
-	// 					},
-	// 					penalty:{
-	// 						red: 123, //red alliance penalty score
-	// 						blue: 123 //blue alliance penalty score
-	// 					},
-	// 					final:{
-	// 						red: 123, //red alliance final score
-	// 						blue: 123 //blue alliance final score
+	// 			{
+	// 				matchInformation:{
+	// 					matchNumber: 123,
+	// 					teams: {
+	// 						red1: 123,
+	// 						red2: 123,
+	// 						blue1: 123,
+	// 						blue2: 123
+	// 					}
+	// 				},
+	// 				resultInformation:{
+	// 					score:{
+	// 						penalty:{
+	// 							red: 123, //red alliance penalty score
+	// 							blue: 123 //blue alliance penalty score
+	// 						},
+	// 						final:{
+	// 							red: 123, //red alliance final score
+	// 							blue: 123 //blue alliance final score
+	// 						}
 	// 					}
 	// 				}
 	// 			}
@@ -161,22 +146,22 @@ app.get('/api/events/ftc/event/uploadSync', (req, res) => {		//change this to po
 				},
 				"auto":{
 					"jewel": 2,
-					"glyph": 3,
-					"key": 3,
-					"park": 15
+					"glyph": 1,
+					"key": 0,
+					"park": 1
 				},
 				"driver":{
 					"glyph": 10,
 					"row": 3,
-					"column": 2,
-					"cipher": 30
+					"column": 1,
+					"cipher": 0
 				},
 				"end":{
 					"relic1": 1,
-					"relic2": 9,
-					"relic3": 7,
-					"relicUp": 6,
-					"balanced": 0
+					"relic2": 0,
+					"relic3": 0,
+					"relicUp": 1,
+					"balanced": 1
 				}
 			},
 			{
@@ -186,23 +171,44 @@ app.get('/api/events/ftc/event/uploadSync', (req, res) => {		//change this to po
 					teams: [123, 123]
 				},
 				"auto":{
-					"jewel": 4,
-					"glyph": 12,
-					"key": 13,
-					"park": 19
+					"jewel": 2,
+					"glyph": 2,
+					"key": 1,
+					"park": 0
 				},
 				"driver":{
-					"glyph": 18,
-					"row": 23,
-					"column": 26,
-					"cipher": 27
+					"glyph": 3,
+					"row": 1,
+					"column": 0,
+					"cipher": 0
 				},
 				"end":{
-					"relic1": 24,
-					"relic2": 29,
-					"relic3": 21,
-					"relicUp": 19,
-					"balanced": 20
+					"relic1": 1,
+					"relic2": 0,
+					"relic3": 0,
+					"relicUp": 1,
+					"balanced": 2
+				}
+			}
+		],
+		matchData:[
+			{
+				matchInformation:{
+					matchNumber: 123,
+					teams: {
+						red1: 123,
+						red2: 123,
+						blue1: 123,
+						blue2: 123
+					}
+				},
+				resultInformation:{
+					score:{
+						penalty:{
+							red: 123, //red alliance penalty score
+							blue: 123 //blue alliance penalty score
+						}
+					}
 				}
 			}
 		]
@@ -217,6 +223,7 @@ app.get('/api/events/ftc/event/uploadSync', (req, res) => {		//change this to po
 				_id: 0,
 				'game.name': 1,
 				'game.period': 1,
+				'game.value': 1,
 				'game.validation': 1
 			}
 		},
@@ -226,11 +233,11 @@ app.get('/api/events/ftc/event/uploadSync', (req, res) => {		//change this to po
 				res.status(500).send(err)
 				return
 			}
-			interpretSeasonFormat(result)
+			interpretSeasonFormatGameData(result)
 		}
 	)
 
-	function interpretSeasonFormat(seasonData){
+	function interpretSeasonFormatGameData(seasonData){
 		//check if any season matched
 		if(seasonData == null){
 			res.status(406).json({error: 'no season found'})
@@ -256,7 +263,7 @@ app.get('/api/events/ftc/event/uploadSync', (req, res) => {		//change this to po
 				})
 			})
 		else{
-			res.status(406).json({error: 'no data found'})
+			res.status(406).json({error: 'no game data found'})
 			return
 		}
 
@@ -302,41 +309,238 @@ app.get('/api/events/ftc/event/uploadSync', (req, res) => {		//change this to po
 			}
 		})
 
-		var abstractData = []
+		// var abstractData = []
 
+		// // {
+		// // 	matchInformation:{
+		// // 		matchNumber: 123,
+		// // 		robotAlliance: 'abc', 	//blue or red; with lower case
+		// // 		teams: [123, 123]
+		// // 	},
+		// // 	gameInformation:[123, 123, 123]
+		// // }
+
+		// //populate abstractData
+		// req.body.gameData.forEach((dataBit) => {
+		// 	let gameInformation = []
+		// 	for(let i = 0; i < seasonData.game.length; i++)
+		// 		gameInformation[i] = dataBit[seasonData.game[i].period][seasonData.game[i].name]
+		// 	abstractData.push(
+		// 		{
+		// 			matchInformation: dataBit.matchInformation,
+		// 			gameInformation: gameInformation
+		// 		}
+		// 	)
+		// })
+		// saveData(abstractData, validationLog)
+
+		interpretSeasonFormatMatchData(seasonData, validationLog)
+	}
+
+	function interpretSeasonFormatMatchData(seasonData, validationLog){
+
+		//check if matchdata
+		if(req.body.matchData == null){
+			res.status(406).json({error: 'no match data found'})
+			return
+		}
+
+		//prep matchData
+		req.body.matchData.forEach((matchDataBit) => {
+			matchDataBit.resultInformation = {
+				winner: 'error',
+				score:{
+					auto: {},
+					driver: {},
+					end: {},
+					total: {},
+					penalty: matchDataBit.resultInformation.score.penalty,
+					final: {}
+				}
+			}
+		})
+
+		req.body.gameData.forEach((dataBit) => {
+			let autoScore = 0
+			let driverScore = 0
+			let endScore = 0
+			seasonData.game.forEach((periodNameValue) => {
+				switch(periodNameValue.period){
+					case 'auto':
+						autoScore += dataBit[periodNameValue.period][periodNameValue.name] * periodNameValue.value
+						break
+					case 'driver':
+						driverScore += dataBit[periodNameValue.period][periodNameValue.name] * periodNameValue.value
+						break
+					case 'end':
+						endScore += dataBit[periodNameValue.period][periodNameValue.name] * periodNameValue.value
+						break
+					default:
+						res.status(500).json({message: 'season data is wrong'})
+				}
+			})
+
+			// req.body.matchData.forEach((matchDataBit) => {
+			// 	if(matchDataBit.matchInformation.matchNumber == dataBit.matchInformation.matchNumber){
+			// 		matchDataBit.resultInformation.score.auto[dataBit.matchInformation.robotAlliance] = autoScore
+			// 		matchDataBit.resultInformation.score.driver[dataBit.matchInformation.robotAlliance] = driverScore
+			// 		matchDataBit.resultInformation.score.end[dataBit.matchInformation.robotAlliance] = endScore
+			// 		matchDataBit.resultInformation.score.total[dataBit.matchInformation.robotAlliance] = autoScore + driverScore + endScore
+			// 		matchDataBit.resultInformation.score.final[dataBit.matchInformation.robotAlliance] = matchDataBit.resultInformation.score.penalty[dataBit.matchInformation.robotAlliance] + matchDataBit.resultInformation.score.total[dataBit.matchInformation.robotAlliance]
+			// 		// break?
+			// 	}
+			// })
+
+			for(let i = 0; i < req.body.matchData.length; i++)
+				if(req.body.matchData[i].matchInformation.matchNumber == dataBit.matchInformation.matchNumber){
+					req.body.matchData[i].resultInformation.score.auto[dataBit.matchInformation.robotAlliance] = autoScore
+					req.body.matchData[i].resultInformation.score.driver[dataBit.matchInformation.robotAlliance] = driverScore
+					req.body.matchData[i].resultInformation.score.end[dataBit.matchInformation.robotAlliance] = endScore
+					req.body.matchData[i].resultInformation.score.total[dataBit.matchInformation.robotAlliance] = autoScore + driverScore + endScore
+					req.body.matchData[i].resultInformation.score.final[dataBit.matchInformation.robotAlliance] = req.body.matchData[i].resultInformation.score.penalty[dataBit.matchInformation.robotAlliance] + req.body.matchData[i].resultInformation.score.total[dataBit.matchInformation.robotAlliance]
+					break
+				}
+
+		})
+
+		//matchdata find winners
+		req.body.matchData.forEach((matchDataBit) => {
+			matchDataBit.resultInformation.winner = matchDataBit.resultInformation.score.final.red == matchDataBit.resultInformation.score.final.blue? 'tie' : matchDataBit.resultInformation.score.final.red > matchDataBit.resultInformation.score.final.blue? 'red' : 'blue'
+		})
+
+		saveData(validationLog)
+	}
+
+	function saveData(validationLog){
+
+		//game data
 		// {
-		// 	matchInformation:{
-		// 		matchNumber: 123,
-		// 		robotAlliance: 'abc', 	//blue or red; with lower case
-		// 		teams: [123, 123]
+		// 	_id:{
+		// 		eventKey: 'abc',			//as found in events
+		// 		matchInformation:{
+		// 			matchNumber: 123,
+		// 			robotAlliance: 'abc', 	//blue or red; with lower case
+		// 			teams: [123, 123]
+		// 		},
+		// 		season:{					//just like season _id
+		// 			season: 'abc',			//as 2017-2018
+		// 			first: 'abc'			//as fll, ftc, frc
+		// 		}
 		// 	},
-		// 	gameInformation:[123, 123, 123]
+		// 	gameInformation:{},				//schema as found in seasons
+		// 	metadata:{
+		// 		permissionLevel: 123,		//dictates the permissions required to edit this data
+		// 		archive: false,				//if true then only admins and mods can view
+		// 		log:{
+		// 			creator: ObjectId(), 	//IMMUTABLE mongodb unique id of user
+		// 			lastEditor: ObjectId(), //mongodb unique id of user
+		// 			birthTime: ISODate(),	//IMMUTABLE time of insertion
+		// 			lastUpdated: ISODate() 	//time of update
+		// 		}
+		// 	}
 		// }
 
-		//populate abstractData
-		req.body.gameData.forEach((dataBit) => {
-			let gameInformation = []
-			for(let i = 0; i < seasonData.game.length; i++)
-				gameInformation[i] = dataBit[seasonData.game[i].period][seasonData.game[i].name]
-			abstractData.push(
+		var gameData = []
+
+		//put into gameData shape for storage
+		req.body.gameData.forEach((gameDataBit) => {
+			gameData.push(
 				{
-					matchInformation: dataBit.matchInformation,
-					gameInformation: gameInformation
+					_id:{
+						eventKey: req.body.eventKey,
+						matchInformation: gameDataBit.matchInformation,
+						season: req.body.seasonId
+					},
+					gameInformation: {
+						auto: gameDataBit.auto,
+						driver: gameDataBit.driver,
+						end: gameDataBit.end
+					}
 				}
 			)
 		})
-		saveData(abstractData, validationLog)
-	}
 
-	function saveData(abstractData, validationLog){
+		//in collection 'matchData'
+		// {
+		// 	_id:{
+		// 		eventKey: 'abc',
+		// 		matchInformation:{
+		// 			matchNumber: 123,
+		// 			teams: {
+		// 				red1: 123,
+		// 				red2: 123,
+		// 				blue1: 123,
+		// 				blue2: 123
+		// 			}
+		// 		}
+		// 	},
+		// 	resultInformation:{
+		// 		winner: 'abc', 	//'blue', 'red', 'tie'
+		// 		score:{
+		// 			auto:{
+		// 				red: 123, //red alliance autonomous score
+		// 				blue: 123 //blue alliance autonomous score
+		// 			},
+		// 			driver:{
+		// 				red: 123, //red alliance tele-op score
+		// 				blue: 123 //blue alliance tele-op score
+		// 			},
+		// 			end:{
+		// 				red: 123, //red alliance end-game score
+		// 				blue: 123 //blue alliance end-game score
+		// 			},
+		// 			total:{
+		// 				red: 123, //red alliance total score
+		// 				blue: 123 //blue alliance total score
+		// 			},
+		// 			penalty:{
+		// 				red: 123, //red alliance penalty score
+		// 				blue: 123 //blue alliance penalty score
+		// 			},
+		// 			final:{
+		// 				red: 123, //red alliance final score
+		// 				blue: 123 //blue alliance final score
+		// 			}
+		// 		}
+		// 	},
+		// 	metadata:{
+		// 		permissionLevel: 123,		//dictates the permissions required to edit this data
+		// 		archive: false,				//if true then only admins and mods can view
+		// 		log:{
+		// 			creator: ObjectId(), 	//IMMUTABLE mongodb unique id of user
+		// 			lastEditor: ObjectId(), //mongodb unique id of user
+		// 			birthTime: ISODate(),	//IMMUTABLE time of insertion
+		// 			lastUpdated: ISODate() 	//time of update
+		// 		}
+		// 	}
+		// }
+
+		var matchData = []
+
+		//put into matchData shape for storage
+		req.body.matchData.forEach((matchDataBit) => {
+			matchData.push(
+				{
+					_id:{
+						eventKey: req.body.eventKey,
+						matchInformation: matchDataBit.matchInformation,
+						season: req.body.seasonId
+					},
+					resultInformation: matchDataBit.resultInformation
+				}
+			)
+		})
+
+		var util = require('util')
+		console.log(util.inspect(req.body, false, null))
+		console.log(util.inspect(gameData, false, null))
+		console.log(util.inspect(matchData, false, null))
 
 		if(validationLog.length == 0)
-			res.status(200).json({rawData: abstractData})
+			res.status(200).json({rawData: {}})
 		else
 			res.status(206).json({warning: validationLog})
 	}
-
-	// res.status(501).json({message: 'upload is not implemented yet'})
 
 })
 
