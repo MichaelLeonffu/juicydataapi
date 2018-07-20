@@ -80,6 +80,20 @@ app.get('/api/events/ftc/event/uploadSchedule', (req, res) => {		//change this t
 
 	//midleware someplace in the middle there
 
+	console.log(req.body)
+	console.log("post body")
+
+	//$eq: req.query.teamNumber
+	db.collection('schedules').save(req.body, {w:1}, function(err, result){
+		if(err)
+			console.log(err)
+
+		console.log(result)
+
+		//if no error?
+		res.status(200).send("Got It")
+	})
+
 })
 
 app.get('/api/events/ftc/event/uploadSync', (req, res) => {		//change this to post when done
