@@ -1,11 +1,11 @@
 //in collection 'season'
 {
 	_id:{
-		season: 'abc',	//as 2017-2018
-		first: 'abc'	//as fll, ftc, frc
+		season: 'abc',			//as 2017-2018
+		first: 'abc'			//as fll, ftc, frc
 	},
-	name: 'abc', 		//of season game i.e Block Party 
-	description: 'abc',	//short description of the season game
+	name: 'abc', 				//of season game i.e Block Party 
+	description: 'abc',			//short description of the season game
 	game:[
 		{
 			period: 'abc',		//auto, driver, or end
@@ -22,33 +22,6 @@
 			}
 		}
 	]
-}
-
-//in collection 'gameData'
-{
-	_id:{
-		eventKey: 'abc',			//as found in events
-		matchInformation:{
-			matchNumber: 123,
-			robotAlliance: 'abc', 	//blue or red; with lower case
-			teams: [123, 123]
-		},
-		season:{					//just like season _id
-			season: 'abc',			//as 2017-2018
-			first: 'abc'			//as fll, ftc, frc
-		}
-	},
-	gameInformation:[123, 123, 123],//for as many elements in the game for this season
-	metadata:{
-		permissionLevel: 123,		//dictates the permissions required to edit this data
-		archive: false,				//if true then only admins and mods can view
-		log:{
-			creator: ObjectId(), 	//IMMUTABLE mongodb unique id of user
-			lastEditor: ObjectId(), //mongodb unique id of user
-			birthTime: ISODate(),	//IMMUTABLE time of insertion
-			lastUpdated: ISODate() 	//time of update
-		}
-	}
 }
 
 //in collection 'schedules'
@@ -77,6 +50,33 @@
 			}
 		}
 	],
+	metadata:{
+		permissionLevel: 123,		//dictates the permissions required to edit this data
+		archive: false,				//if true then only admins and mods can view
+		log:{
+			creator: ObjectId(), 	//IMMUTABLE mongodb unique id of user
+			lastEditor: ObjectId(), //mongodb unique id of user
+			birthTime: ISODate(),	//IMMUTABLE time of insertion
+			lastUpdated: ISODate() 	//time of update
+		}
+	}
+}
+
+//in collection 'gameData'
+{
+	_id:{
+		eventKey: 'abc',			//as found in events
+		matchInformation:{
+			matchNumber: 123,
+			robotAlliance: 'abc', 	//blue or red; with lower case
+			teams: [123, 123]
+		},
+		season:{					//just like season _id
+			season: 'abc',			//as 2017-2018
+			first: 'abc'			//as fll, ftc, frc
+		}
+	},
+	gameInformation:{},				//schema as found in seasons
 	metadata:{
 		permissionLevel: 123,		//dictates the permissions required to edit this data
 		archive: false,				//if true then only admins and mods can view
