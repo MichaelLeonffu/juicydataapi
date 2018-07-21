@@ -3,6 +3,16 @@
 const bcrypt 	= require('bcrypt')
 const jwt 		= require('jsonwebtoken')
 
+function cleanEmail(email){
+	var emailParts = email.split('@')
+	return emailParts[0].toLowerCase().replace(/\./g, '') + '@' + emailParts[1]
+}
+
+function checkEmailForm(email){
+	var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+	return re.test(String(email).toLowerCase())
+}
+
 //var validate 	= require('jsonschema').validate
 module.exports 	= function(config, app, db){
 
@@ -27,6 +37,40 @@ app.get('/api/accounts/accounts/email-verification/send-email', (req, res) => {
 })
 
 app.get('/api/accounts/accounts/email-verification/verify', (req, res) => {
+
+	// req = {
+	// 	body:{
+	// 		data: 'abc'
+	// 	}
+	// }
+
+
+	//res options in email-verification process; add a descriptor for each implementation
+	res.status(501).json({message: 'email-verification is not implemented yet'})
+})
+
+app.post('/api/accounts/accounts/forgot-password', (req, res) => {
+
+	// req = {
+	// 	query:{
+	// 		email: 'abc'
+	// 	}
+	// }
+
+
+	//res options in email-verification process; add a descriptor for each implementation
+	res.status(501).json({message: 'email-verification is not implemented yet'})
+})
+
+app.post('/api/accounts/accounts/reset-password', (req, res) => {
+
+	// req = {
+	// 	query:{
+	// 		password: 'abc'
+	// 	}
+	// }
+
+
 	//res options in email-verification process; add a descriptor for each implementation
 	res.status(501).json({message: 'email-verification is not implemented yet'})
 })
@@ -43,25 +87,23 @@ app.get('/api/accounts/accounts/check-email', (req, res) => {	//Checks if the em
 
 	//converts to lowercase; removes any periods before @ sign; 
 
-	db.collection('users').findOne({users: req.query.email}, checkEmail)
-
-	function checkEmail(err, result){
+	db.collection('users').findOne({users: req.query.email}, (err, result) => {
 		if(err){
 			console.log(err)
 			res.status(500).send(err)
-			return //do I need this return, or any returns? (I'm using a if else already)
+			return
 		}
-		if(result.result.ok == 1){
+		if(result.result.ok == 1)
 			res.status(202).json({message:'email is not taken'})
-		}else{
+		else
 			res.status(409).json({message:'email is taken'})
-		}
-	}
+		
+	})
 })		//FIX FOR NOSQL INJECT ATTACKS; needs validation
 
 app.post('/api/accounts/accounts/signup', (req, res) =>{		//Creating an account
 
-	// req = {	All required
+	// req = {
 	// 	body: {
 	// 		email: 'abc',
 	// 		password: 'abc'
@@ -73,6 +115,10 @@ app.post('/api/accounts/accounts/signup', (req, res) =>{		//Creating an account
 	// }
 
 	//TEMP:
+
+	req.body.email = cleanEmail(req.body.email)
+
+	console.log(checkEmailForm(req.body.email))
 
 	console.log(req.body)
 
@@ -174,19 +220,21 @@ app.post('/api/accounts/accounts/signup', (req, res) =>{		//Creating an account
 	}
 })		//needs validation; protect noSQL inject attacks; maybe add support for name and stuff in profiles?
 
-app.get('/api/accounts/accounts/signin', (req, res) =>{			//Check if the user is valid then return the JWT
+app.post('/api/accounts/accounts/signin', (req, res) =>{			//Check if the user is valid then return the JWT
 
 	// req = {
-	// 	query:{
+	// 	body:{
 	// 		email: 'abc',
 	// 		password: 'abc'
 	// 	}
 	// }
 
+	console.log(req.body)
+
 	//TEMP:
 
-	var localEmail = String(req.query.email)
-	var localPassword = String(req.query.password)
+	var localEmail = String(req.body.email)
+	var localPassword = String(req.body.password)
 
 	//VALIDATION GOES HERE
 
