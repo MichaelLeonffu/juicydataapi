@@ -85,7 +85,12 @@ app.get('/api/accounts/accounts/check-email', (req, res) => {	//Checks if the em
 
 	//VALIDATION GOES HERE
 
-	//converts to lowercase; removes any periods before @ sign; 
+	req.query.email = cleanEmail(req.query.email)
+
+	if(!checkEmailForm(req.query.email)){
+		res.status(406).json({message: 'bad email form'})
+		return
+	}
 
 	db.collection('users').findOne({users: req.query.email}, (err, result) => {
 		if(err){
@@ -118,7 +123,10 @@ app.post('/api/accounts/accounts/signup', (req, res) =>{		//Creating an account
 
 	req.body.email = cleanEmail(req.body.email)
 
-	console.log(checkEmailForm(req.body.email))
+	if(!checkEmailForm(req.body.email)){
+		res.status(406).json({message: 'bad email form'})
+		return
+	}
 
 	console.log(req.body)
 
@@ -228,6 +236,13 @@ app.post('/api/accounts/accounts/signin', (req, res) =>{			//Check if the user i
 	// 		password: 'abc'
 	// 	}
 	// }
+
+	req.body.email = cleanEmail(req.body.email)
+	
+	if(!checkEmailForm(req.body.email)){
+		res.status(406).json({message: 'bad email form'})
+		return
+	}
 
 	console.log(req.body)
 
