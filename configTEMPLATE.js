@@ -16,9 +16,10 @@ module.exports = {
 	},
 	accounts:{
 		tenativeTime: 432000000,	//5 days, in milliseconds; to verify email in signup
-		passwordChangeTime: 360000	//30 minutes in millisecounds; to change password in forget or reset password
+		passwordChangeTime: 360000,	//30 minutes in millisecounds; to change password in forget or reset password
+		saltRounds: 15				//amount of rounds of salt that bycrypt will use
 	},
-	permissions:[	//Add more permissions this way or change exsisting permissions
+	permissions:[	//add more permissions this way or change exsisting permissions
 		{
 			group: 'admin',
 			permissionLevel: 4.0
