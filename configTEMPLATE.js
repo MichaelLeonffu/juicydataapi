@@ -14,6 +14,10 @@ module.exports = {
 	jwt:{
 		key: 'secret'
 	},
+	accounts:{
+		tenativeTime: 432000000,	//5 days, in milliseconds; to verify email in signup
+		passwordChangeTime: 360000	//30 minutes in millisecounds; to change password in forget or reset password
+	},
 	permissions:[	//Add more permissions this way or change exsisting permissions
 		{
 			group: 'admin',
