@@ -19,6 +19,11 @@ module.exports = {
 		passwordChangeTime: 360000,	//30 minutes in millisecounds; to change password in forget or reset password
 		saltRounds: 15				//amount of rounds of salt that bycrypt will use
 	},
+	nodemailer:{
+		service: 'email',
+		email: 'juicydataemail@email.com',
+		password: 'password123ABC'
+	},
 	permissions:[	//add more permissions this way or change exsisting permissions
 		{
 			group: 'admin',
