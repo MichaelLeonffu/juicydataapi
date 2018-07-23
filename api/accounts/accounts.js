@@ -436,7 +436,7 @@ app.post('/api/accounts/accounts/signin', (req, res) =>{			//Check if the user i
 				if(account)
 					comparePassword(account)
 				else
-					return res.status(404).json({message: 'wrong password or account'}) //account wrong
+					return res.status(400).json({message: 'wrong password or account'}) //account wrong
 			}
 		})
 	}
@@ -451,20 +451,36 @@ app.post('/api/accounts/accounts/signin', (req, res) =>{			//Check if the user i
 					return res.status(503).json({message: 'the compare failed'})
 				else{
 					if(same === true)
-						jwt.sign({jti:String(account._id)}, config.jwt.key, {algorithm: 'HS256'}, (err, token) =>{
-							if(err)
-								return res.status(503).json({message: 'jwt failed sign'})
-							else{
-								console.log('Sign in token generated: %o', token)
-								res.cookie('juicydata-auth-token', token, { maxAge: 86400000, httpOnly: true})	//cookie lasts for 24 hours; place this in config
-								return res.status(201).json({token: token})
-							}
-						})
+						generateAuthToken(account)
 					else
-						return res.status(404).json({message: 'wrong password or account'})	//password wrong
+						return res.status(400).json({message: 'wrong password or account'})	//password wrong
 				}
 			}
 		)
+	}
+
+	function generateAuthToken(account){
+		//find profile first
+		db.collection('profile').findOne({_id: ObjectId(account._id)}, (err, result) => {
+			if(err)
+				return res.status(500).json({message: 'failed to get profile for user'})
+			if(!result)
+				return res.status(400).json({message: 'missing profile data for user'})
+			jwt.sign(
+				{
+					jti: String(account._id),
+					name: String(result.name.first + ' ' + result.name.last)
+				}, 
+				config.jwt.key, {algorithm: 'HS256'}, (err, token) =>{
+				if(err)
+					return res.status(503).json({message: 'jwt failed sign'})
+				else{
+					console.log('Sign in token generated: %o', token)
+					res.cookie('juicydata-auth-token', token, { maxAge: 86400000, httpOnly: true})	//cookie lasts for 24 hours; place this in config
+					return res.status(201).json({token: token})
+				}
+			})
+		})
 	}
 })		//needs validation; protect noSQL inject attacks
 
