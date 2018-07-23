@@ -19,7 +19,14 @@ module.exports = {
 		passwordChangeTime: 360000,	//30 minutes in millisecounds; to change password in forget or reset password
 		saltRounds: 15				//amount of rounds of salt that bycrypt will use
 	},
+	ui:{
+		url: 'https://juicydata.info'
+	},
 	developer:{						//running in developer mode; disables certain features/enables others
+		ui:{
+			url: 'http://localhost:1234',
+			accounts: false			//use this url for accounts	
+		},
 		accounts:{
 			devEmail: false			//Email dev account or real account
 		}
