@@ -414,72 +414,54 @@ app.post('/api/accounts/accounts/signin', (req, res) =>{			//Check if the user i
 	// 	}
 	// }
 
+	console.log('Request: %o', req.body)
+
 	req.body.email = cleanEmail(req.body.email)
 
 	if(!checkEmailForm(req.body.email)){
 		res.status(406).json({message: 'bad email form'})
 		return
 	}
-
-	console.log(req.body)
-
-	//TEMP:
-
-	var localEmail = String(req.body.email)
-	var localPassword = String(req.body.password)
+	else
+		findAccount()
 
 	//VALIDATION GOES HERE
 
-	db.collection('users').findOne({email:localEmail}, accountFound)
-
-	function accountFound(err, account){
-		if(err){
-			console.log(err)
-			res.status(500).send(err)
-			return //do I need this return, or any returns? (I'm using a if else already)
-		}else{
-			console.log(account)
-			if(account){
-				comparePassword(account)
-			}else{
-				res.status(400).json({message:'account not found '})
-				return
+	function findAccount(){
+		db.collection('users').findOne({email:req.body.email}, (err, account) => {
+			if(err)
+				return res.status(500).json({message: 'error, finding user account'})
+			else{
+				console.log('Account found: %o', account)
+				if(account)
+					comparePassword(account)
+				else
+					return res.status(404).json({message: 'wrong password or account'}) //account wrong
 			}
-		}
+		})
 	}
 
 	function comparePassword(account){
 		bcrypt.compare(
-			localPassword,
+			req.body.password,
 			account.password,
 			(err, same) =>{
 				//result of the compare
-				if(err){
-					console.log(err)
-					res.status(503).json({message: 'the compare failed'})
-					return
-				}else{
-					console.log(account)
-					if(same === true){
-						//result.insertedId	//This is the object Id of that user
+				if(err)
+					return res.status(503).json({message: 'the compare failed'})
+				else{
+					if(same === true)
 						jwt.sign({jti:String(account._id)}, config.jwt.key, {algorithm: 'HS256'}, (err, token) =>{
-							if(err){
-								console.log(err)
-								res.status(503).json({message:'jwt failed sign'})
-								return
-							}else{
-								console.log(token)
-								//res.cookie('token', token)
-								res.status(201).json({token: token})
-								return
+							if(err)
+								return res.status(503).json({message: 'jwt failed sign'})
+							else{
+								console.log('Sign in token generated: %o', token)
+								res.cookie('juicydata-auth-token', token, { maxAge: 86400000, httpOnly: true})	//cookie lasts for 24 hours; place this in config
+								return res.status(201).json({token: token})
 							}
 						})
-						return
-					}else{
-						//If password was wrong
-						res.status(401).json({message: 'wrong password'})
-						return
-					}
+					else
+						return res.status(404).json({message: 'wrong password or account'})	//password wrong
 				}
 			}
 		)
