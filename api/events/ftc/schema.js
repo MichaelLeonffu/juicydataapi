@@ -312,6 +312,17 @@
 	]
 }
 
+//in collection 'algorithms'
+{
+	_id:{
+		name: 'abc',			//example: Offensive Power Rating
+		version: 123
+	},
+	shotname: 'abc',			//example: OPR
+	description: 'abc',
+	permissionLevel: 123		//which users can use this
+}
+
 //in collection 'predictions'
 {
 	//UNDER CONSTRUCTION; predicts similarly as algorhithm in stats; via differnt allgorithms per each amtch
