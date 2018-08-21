@@ -6,6 +6,7 @@ const	port 			= process.env.PORT || 3000
 const	morgan 			= require('morgan')
 const	bodyParser 		= require('body-parser')
 const	cookieParser	= require('cookie-parser')
+const   jwt             = require('jsonwebtoken')
 
 //Add logic to check if config file exsists (if not then exit and prompt user)
 //Add logic to check if database files have been intintazlied; such as teams data and seasons data
@@ -35,6 +36,32 @@ function someMiddleWare(req, res, next){
 }
 
 app.use(someMiddleWare)
+
+function authenticationMiddleware(req, res, next) {
+	token = req.cookies['juicydata-auth-token'];
+	if (token) {
+		jwt.verify(
+			token, 
+			config.jwt.key, {algorithm: 'HS256'}, (err, decoded) =>{
+			if(err){
+				res.clearCookie('juicydata-auth-token')
+				if (err.name === 'TokenExpiredError'){
+					req.authTokenExpired = true;
+					console.log('juicydata-auth-token expired!', decoded)
+				}else
+					return res.status(503).json({message: 'jwt failed verify'})
+			}else{
+				req.user = {}
+				req.user._id = decoded.jti
+				req.user.name = decoded.name
+				console.log('Decoded juicydata-auth-token:', decoded)
+			}
+		})
+	}
+	next()
+}
+
+app.use(authenticationMiddleware)
 
 MongoClient.connect(configDB.url, function(err, client){
 	assert.equal(null, err)
