@@ -24,6 +24,25 @@ module.exports 	= function(config, app, db){
 	//Make sure that email resend process isnt spamable; and limits to 5 tries
 	//Somehow ip block spamers; have a DB for that
 
+//email address subscribtion
+app.post('/api/accounts/accounts/email-subscription', (req, res) => {
+
+	// req.body = {
+	// 	email: 'abc'
+	// }
+
+	console.log('reeust email thing', req.body)
+
+	db.collection('emails').insertOne({email: req.body.email}, (err, result) => {
+		if(err){
+			return res.status(501).json({message: 'FIX LATTER!'})
+		}else{
+			res.status(200).json({message: result})
+		}
+	})
+
+})
+
 //Email verification process 
 
 app.get('/api/accounts/accounts/email-verification', (req, res) => {
@@ -386,11 +405,18 @@ app.post('/api/accounts/accounts/signup', (req, res) =>{		//Creating an account
 				expireTime: config.accounts.tenativeTime + 'milliseconds'
 			}
 
+			// var mailOptions = {
+			// 	from: '"Juicy Data Info" <juicydatainfo@gmail.com',
+			// 	to: config.developer.accounts.devEmail? 'juicydatainfo@gmail.com': req.body.email,
+			// 	subject: 'Juicy Data email verification',
+			// 	text: mailMessage.fullName + ',\n\nWelcome to Juicy Data!\nTo finish the account creation, click on this link: ' + mailMessage.link + '\nAccount and link will expire in ' + mailMessage.expireTime + ' if not used.\n\nThank you,\nJuicy Data Developers' //timestamp from result as well
+			// }
+
 			var mailOptions = {
 				from: '"Juicy Data Info" <juicydatainfo@gmail.com',
 				to: config.developer.accounts.devEmail? 'juicydatainfo@gmail.com': req.body.email,
 				subject: 'Juicy Data email verification',
-				text: mailMessage.fullName + ',\n\nWelcome to Juicy Data!\nTo finish the account creation, click on this link: ' + mailMessage.link + '\nAccount and link will expire in ' + mailMessage.expireTime + ' if not used.\n\nThank you,\nJuicy Data Developers' //timestamp from result as well
+				text: 'Welcome to Juicy Data!\nTo finish the account creation, click on this link: ' + mailMessage.link + '\nAccount and link will expire in 5 days if not used.\n\nThank you,\nJuicy Data Developers' //timestamp from result as well
 			}
 
 			transporter.sendMail(mailOptions, (err, info) => {
@@ -484,14 +510,21 @@ app.post('/api/accounts/accounts/signin', (req, res) =>{			//Check if the user i
 	}
 })		//needs validation; protect noSQL inject attacks
 
-// app.get('/api/accounts/accounts/signout', (req, res) =>{
+app.get('/api/accounts/accounts/signout', (req, res) =>{
 
-// 	//Kills the JWT; Cleint side kills the JWT but server side logs it?
+	//Kills the JWT; Cleint side kills the JWT but server side logs it?
 
-// })
+	//incomplete
+
+	res.clearCookie('juicydata-auth-token')
+	res.clearCookie('juicydata-session-id')
+
+	res.status(200).json({message: 'removed cookies'})
+
+})
 
 app.get('/api/accounts/accounts/check-signin', (req, res) => {
-	if(req.user) {
+	if(req.user._id) {
 		res.status(200).json({signedIn: true})
 	} else {
 		res.status(200).json({signedIn: false})

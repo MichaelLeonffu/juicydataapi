@@ -62,10 +62,11 @@ app.get('/api/teapot', (req, res) => {
 // })
 
 app.post('/api/navigation/enter', (req, res) => {
+	console.log('ITS RES HERE: ', res.headersSent)
 	res.status(200).send()
 })
-app.post('/api/navigation/leave', (req, res) => {
-	res.status(200).send()
-})
+// app.post('/api/navigation/leave', (req, res) => {
+// 	res.status(200).send()
+// })
 
 }
