@@ -490,4 +490,12 @@ app.post('/api/accounts/accounts/signin', (req, res) =>{			//Check if the user i
 
 // })
 
+app.get('/api/accounts/accounts/check-signin', (req, res) => {
+	if(req.user) {
+		res.status(200).json({signedIn: true})
+	} else {
+		res.status(200).json({signedIn: false})
+	}
+})
+
 }
