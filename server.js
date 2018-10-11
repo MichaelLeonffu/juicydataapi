@@ -65,7 +65,7 @@ function authenticationMiddleware(req, res, next) {
 	next()
 }
 
-app.use(authenticationMiddleware)
+// app.use(authenticationMiddleware)
 
 var util = require('util')
 
@@ -206,7 +206,7 @@ MongoClient.connect(configDB.url, function(err, client){
 		}
 	}
 
-	app.use(sessionMiddleware)
+	// app.use(sessionMiddleware)
 
 	function requestsMiddleware(req, res, next){
 
@@ -324,7 +324,7 @@ MongoClient.connect(configDB.url, function(err, client){
 		})
 	}
 
-	app.use(requestsMiddleware)
+	// app.use(requestsMiddleware)
 
 	require('./api/api')(config, app, db)
 })
