@@ -39,6 +39,7 @@ Thumbs.db
 
 # data
 /data/db
+/data/uploads
 
 #config
 /config.js
