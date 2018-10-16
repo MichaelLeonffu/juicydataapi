@@ -12,7 +12,7 @@ app.get('/api/version', (req, res) => {
 
 //Connecting all APIs
 
-// require('./accounts/accountsapi')(config, app, db)
+require('./accounts/accountsapi')(config, app, db)
 // require('./events/eventsapi')(config, app, db)
 // require('./blog/blogsapi')(config, app, db)
 require('./leagues/leaguesapi')(config, app, db)

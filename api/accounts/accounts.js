@@ -31,16 +31,13 @@ app.post('/api/accounts/accounts/email-subscription', (req, res) => {
 	// 	email: 'abc'
 	// }
 
-	console.log('reeust email thing', req.body)
+	console.log('result email thing', req.body)
 
-	db.collection('emails').insertOne({email: req.body.email}, (err, result) => {
-		if(err){
+	db.collection('emails').insertOne({email: req.body.email}, (err, result) =>{
+		if(err)
 			return res.status(501).json({message: 'FIX LATTER!'})
-		}else{
-			res.status(200).json({message: result})
-		}
+		res.status(200).json({message: result})	
 	})
-
 })
 
 //Email verification process 
