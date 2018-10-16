@@ -78,7 +78,7 @@ app.get('/api/leagues/token-used', (req, res) => {
 
 	db.collection('leagueRegistrationKey').findOne(
 	{
-		_id: req.query.key
+		key: req.query.key
 	}, (err, result) =>{
 		if(err)
 			return res.status(500).json({message: 'Finding failed'})
@@ -92,6 +92,8 @@ app.get('/api/leagues/token-used', (req, res) => {
 //upload an image
 app.post('/api/leagues/upload-logo', upload.fields([{name: 'logo'}]), (req, res) =>{
 	console.log(req.files)
+	if(!req || !req.files || !req.files.logo[0] || !req.files.logo[0].filename)
+		return res.status(400).json({messsage: 'no logo'})
 	res.status(200).json({fileName: req.files.logo[0].filename})
 })
 
@@ -148,7 +150,7 @@ app.post('/api/leagues/sign-up', (req, res) => {
 		//check if the jwt is used or not
 		db.collection('leagueRegistrationKey').findOne(
 			{
-				_id: req.body.jwt
+				key: req.body.jwt
 			},
 			(err, result) =>{
 				if(err)
@@ -234,7 +236,7 @@ app.post('/api/leagues/sign-up', (req, res) => {
 														//set their token to true used
 														db.collection('leagueRegistrationKey').updateOne(
 															{
-																_id: req.body.jwt
+																key: req.body.jwt
 															},
 															{
 																$set: {used: true}

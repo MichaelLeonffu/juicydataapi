@@ -27,9 +27,9 @@
 
 //in collection leagueRegistrationKey
 {
-	_id: 'abc',	//key
+	_id: 123,	//teamNumber
 	name: 'abc',
-	teamNumber: 123,
+	key: 'abc',
 	email: 'abc',
 	used: false	//turns true when used
 }
