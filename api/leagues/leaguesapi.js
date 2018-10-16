@@ -20,24 +20,29 @@ app.get('/api/leagues', (req, res) => {
 app.get('/api/leagues/get-info', (req, res) => {
 
 	// req.query = {
-	// 	week: 123 //1 or 2
+	// 	week : 123 //week number
 	// }
 
 	// res = {
-	// 	[
+	// 	leagues: [
 	// 		{
-	// 			_id: 'abc',		//league ID
-	// 			leagueInfo: {
-	// 				location: 'abc',
-	// 				address: 'abc',
-	// 				date: 'abc',
-	// 				time: {
-	// 					start: 'abc',
-	// 					end: 'abc'
+	// 			leagueName: 'abc',
+	// 			leagueMeets:[
+	// 				{
+	// 					_id: 'abc',		//league ID
+	// 					leagueInfo: {
+	// 						location: 'abc',
+	// 						address: 'abc',
+	// 						date: 'abc',
+	// 						time: {
+	// 							start: 'abc',
+	// 							end: 'abc'
+	// 						},
+	// 						week: 123 //1 or 2
+	// 					},
+	// 					slots: 123,		//how many filled in slots
 	// 				},
-	// 				week: 123 //1 or 2
-	// 			},
-	// 			slots: 123,		//how many filled in slots
+	// 			]
 	// 		},
 	// 	]
 	// }
@@ -45,13 +50,28 @@ app.get('/api/leagues/get-info', (req, res) => {
 	if(typeof req.query.week == 'undefined')
 		return res.status(400).json({message: 'BAD REQUEST NO WEEK QUERY'})
 
-	if(req.query.week != 1 && req.query.week != 2)
-		return res.status(400).json({message: 'BAD REQUEST NOT 1 or 2'})
+	console.log(req.query.week)
 
-	db.collection('leagues').find(
-		{
-			'leagueInfo.week': Number(req.query.week)
-		}, 
+	db.collection('leagues').aggregate(
+		[
+			{$match:{
+				'leagueInfo.week': Number(req.query.week)
+			}},
+			{$project:{
+				teams: 0
+			}},
+			{$group:{
+				_id:'$leagueInfo.leagueName',
+				leagueMeets:{
+					$addToSet:'$$ROOT'
+				}
+			}},
+			{$project:{
+				_id: 0,
+				leagueName:'$_id',
+				leagueMeets: '$leagueMeets'
+			}}
+		], 
 		{
 			teams: 0
 		}, (err, result) => {
@@ -60,9 +80,7 @@ app.get('/api/leagues/get-info', (req, res) => {
 			result.toArray((err, results) => {
 				if(err)
 					return res.status(500).json({message: 'some error making cursor'})
-				for(let i = 0; i < results.length; i++)
-					results[i].teams = 'teehee no!'
-				res.status(200).json(results)
+				res.status(200).json({leagues: results})
 			})
 		}
 	)
@@ -158,9 +176,9 @@ app.post('/api/leagues/sign-up', (req, res) => {
 				if(err)
 					return res.status(500).json({message: 'some error finding the league Reigstion Key'})
 				if(!result || typeof result.used == 'undefined')
-					return res.status(500).json({message: 'No key found for that jwt or no used'})
+					return res.status(400).json({message: 'No key found for that jwt or no used'})
 				if(result.used)
-					return res.status(500).json({message: 'This key has already been used'})
+					return res.status(400).json({message: 'This key has already been used'})
 				//check two leagues if they are valid combination of leagues
 				db.collection('leagues').findOne(
 					{
@@ -170,7 +188,7 @@ app.post('/api/leagues/sign-up', (req, res) => {
 						if(err)
 							return res.status(500).json({message: 'some error getting meet1'})
 						if(!result1)
-							return res.status(500).json({message: 'invalid meet1, not found'})
+							return res.status(400).json({message: 'invalid meet1, not found'})
 						db.collection('leagues').findOne(
 							{
 								_id: req.body.meetPick2
@@ -179,14 +197,16 @@ app.post('/api/leagues/sign-up', (req, res) => {
 								if(err)
 									return res.status(500).json({message: 'some error getting meet2'})
 								if(!result2)
-									return res.status(500).json({message: 'invalid meet2, not found'})
+									return res.status(400).json({message: 'invalid meet2, not found'})
 								if( //condituions to fail!
 									(result1.leagueInfo.week != 1 && result1.leagueInfo.week != 2) || 
 									(result2.leagueInfo.week != 1 && result2.leagueInfo.week != 2) ||
 									result1.leagueInfo.week == result2.leagueInfo.week) //each week needs to be either 1 or 2 and cannot be same
-									return res.status(500).json({message: 'weeks are either not 1 or 2; or the same value'})
+									return res.status(400).json({message: 'weeks are either not 1 or 2; or the same value'})
 								if(result1.slots >= 14 || result2.slots >= 14) //check if full
-									return res.status(500).json({message: 'either meet week 1 or 2 is full'})
+									return res.status(400).json({message: 'either meet week 1 or 2 is full'})
+								if(result1.leagueInfo.leagueName != result2.leagueInfo.leagueName) //if the events are not the same league
+									return res.status(400).json({message: 'events are not part of the same league'})
 								//all is good lets go boiz!
 								db.collection('socials').updateOne(
 									{

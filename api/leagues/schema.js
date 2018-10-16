@@ -10,6 +10,7 @@
 			end: 'abc'
 		},
 		week: 123, //1 or 2
+		leagueName: 'abc' //name of that league
 	},
 	slots: 123,		//how many filled in slots
 	teams: [123, 123, 123, ]	//teams which signed up for this
