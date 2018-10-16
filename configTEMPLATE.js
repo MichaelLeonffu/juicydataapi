@@ -32,6 +32,7 @@ module.exports = {
 		}
 	},
 	nodemailer:{
+		name: '"Juicy Data" <jd@gmail.com',
 		service: 'email',
 		email: 'juicydataemail@email.com',
 		password: 'password123ABC'
