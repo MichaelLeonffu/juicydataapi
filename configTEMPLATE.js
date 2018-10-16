@@ -9,7 +9,7 @@ module.exports = {
 		db: 'JuicyData'
 	},
 	api:{
-		version: '2.0.0-alpha'
+		version: '3.0.0-alpha'
 	},
 	jwt:{
 		key: 'secret'
@@ -35,6 +35,9 @@ module.exports = {
 		service: 'email',
 		email: 'juicydataemail@email.com',
 		password: 'password123ABC'
+	},
+	multer:{
+		dest: '/Users/user/Developer/juicydata/juicydataapi/juicydataapi/data/uploads/'
 	},
 	permissions:[	//add more permissions this way or change exsisting permissions
 		{

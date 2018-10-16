@@ -2,9 +2,10 @@
 
 const multer 	= require('multer')
 const jwt 		= require('jsonwebtoken')
-const upload 	= multer({dest: '/Users/michaelleonffu/Developer/juicydata/juicydataapi/juicydataapi/data/uploads/'})
 
 module.exports = function(config, app, db){
+
+const upload 	= multer({dest: config.multer.dest})
 
 app.get('/api/leagues', (req, res) => {
 	res.status(200).json({message: 'leagues api home'})
