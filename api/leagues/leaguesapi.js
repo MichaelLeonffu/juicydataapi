@@ -1,11 +1,12 @@
 //leaguesapi by Michael Leonffu
 
-const multer 	= require('multer')
-const jwt 		= require('jsonwebtoken')
+const multer 		= require('multer')
+const jwt 			= require('jsonwebtoken')
+const nodemailer 	= require('nodemailer')
 
 module.exports = function(config, app, db){
 
-const upload 	= multer({dest: config.multer.dest})
+const upload 		= multer({dest: config.multer.dest})
 
 app.get('/api/leagues', (req, res) => {
 	res.status(200).json({message: 'leagues api home'})
@@ -134,7 +135,7 @@ app.post('/api/leagues/sign-up', (req, res) => {
 
 	contacts.push(req.body.contacts[0]) //primary is 0
 
-	for(let i = 0; i < req.body.contacts.length; i++)
+	for(let i = 1; i < req.body.contacts.length; i++)
 		if(req.body.contacts[i].firstName && req.body.contacts[i].lastName && req.body.contacts[i].email && req.body.contacts[i].phone)
 			contacts.push(req.body.contacts[i])
 
@@ -194,6 +195,7 @@ app.post('/api/leagues/sign-up', (req, res) => {
 									{
 										$set: {
 											_id: Number(decoded.teamNumber),	//team number
+											contacts: req.body.contacts,
 											facebook: req.body.facebook,
 											twitter: req.body.twitter,
 											instagram: req.body.instagram,
@@ -245,7 +247,42 @@ app.post('/api/leagues/sign-up', (req, res) => {
 															(err, result) =>{
 																if(err)
 																	return res.status(500).json({message: 'somehow didnt set the update token status'})
-																res.status(200).json({message: 'good'})
+																nodemailer.createTestAccount((err, account) => {		//can be moved apart when new api is created
+																	const transporter = nodemailer.createTransport({
+																		service: config.nodemailer.service,
+																		auth:{
+																			user: config.nodemailer.email,
+																			pass: config.nodemailer.password
+																		}
+																	})
+
+																	const mailContent = generateEmailContentConfirm(
+																		decoded.teamNumber, 
+																		result1.leagueInfo.location,
+																		result1.leagueInfo.date,
+																		result1.leagueInfo.address,
+																		result1.leagueInfo.time.start + ' - ' + result1.leagueInfo.time.end,
+																		result2.leagueInfo.location,
+																		result2.leagueInfo.date,
+																		result2.leagueInfo.address,
+																		result2.leagueInfo.time.start + ' - ' + result2.leagueInfo.time.end
+																	)
+
+																	transporter.sendMail(
+																	{
+																		from: config.nodemailer.name,
+																		to: req.body.contacts[0].email,
+																		subject: 'TEST: ' + mailContent.subject,
+																		html: mailContent.html
+																	}, 
+																		(err, info) =>{
+																			if(err)
+																				return console.log(err)
+																			console.log('Message sent: %s', info.messageId)
+																			res.status(200).json({message: 'good'})
+																		}
+																	)
+																})
 															}
 														)
 													}
@@ -263,4 +300,87 @@ app.post('/api/leagues/sign-up', (req, res) => {
 	})
 })
 
+}
+
+function generateEmailContentConfirm(teamNumber, meetLocation1, meetDate1, meetAddress1, meetTime1, meetLocation2, meetDate2, meetAddress2, meetTime2){
+	return {
+		subject: 'SDFTC 2018-2019 Registration Confirmation for Team ' + teamNumber,
+		html: `<table role="presentation" aria-hidden="true" cellspacing="0" cellpadding="0" border="0" align="center" width="100%"
+			style="border-collapse:collapse!important;border-spacing:0!important;margin:0 auto;max-width:600px;table-layout:fixed!important">
+			<tbody>
+				<tr>
+					<td style="padding:20px 0;text-align:center" align="center">
+						<a href="https://juicydata.info/" style="color:#fa9235;outline:0" target="_blank">
+							<img src="https://juicydata.info/assets/logo-text.png" aria-hidden="true" width="220" height="54"
+								border="0" style="font-family:sans-serif;font-size:15px;height:auto;line-height:20px;outline:0">
+						</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<div style="font-family:'Helvetica Neue','Arial',sans-serif;font-size:17px;line-height:1.45;margin:auto;max-width:600px">
+			<table role="presentation" aria-hidden="true" cellspacing="0" cellpadding="0" border="0" align="center" width="100%"
+				style="border-collapse:collapse!important;border-spacing:0!important;margin:0 auto;max-width:600px;table-layout:fixed!important">
+				<tbody>
+					<tr>
+						<td bgcolor="#ffffff">
+							<table role="presentation" aria-hidden="true" cellspacing="0" cellpadding="0" border="0" width="100%"
+								style="border-collapse:collapse!important;border-spacing:0!important;margin:0 auto;table-layout:fixed!important;font-size:17px;line-height:1.45">
+								<tbody>
+									<tr>
+										<td style="color:#444444;padding:0 20px 20px">
+											Hi <strong>Team ` + teamNumber + `!</strong>
+											<br>
+											<br>
+											This is a confirmation of the events you registered for in the <strong>2018-2019
+												San Diego FTC Rover Ruckus Season.</strong> Please note that these are only
+											your <strong>2nd and 3rd meets.</strong> Look for other emails from the region for
+											your 1st meet and league championship information.
+											<br>
+											<br>
+
+											<strong>Meet 2: </strong>
+											<br>
+											Location: <strong>` + meetLocation1 + `</strong>
+											<br>
+											Date: <strong>` + meetDate1 + `</strong>
+											<br>
+											Address: <strong>` + meetAddress1 + `</strong>
+											<br>
+											Time: <strong>` + meetTime1 + `</strong>
+											<br>
+											<br>
+											<strong>Meet 3: </strong>
+											<br>
+											Location: <strong>` + meetLocation2 + `</strong>
+											<br>
+											Date: <strong>` + meetDate2 + `</strong>
+											<br>
+											Address: <strong>` + meetAddress2 + `</strong>
+											<br>
+											Time: <strong>` + meetTime2 + `</strong>
+											<br>
+											<br>
+
+											Good luck and have fun this season!
+											<br>
+											<br>
+											Regards,
+											<br>
+											The Juicy Data Team
+
+											<br>
+											<br>
+											If you have any questions, comments, concerns, or come across any errors, please do
+											not reply to this email. Send us an email at <a href="mailto:juicydatainfo@gmail.com">juicydatainfo@gmail.com.</a>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>`
+	}
 }
