@@ -10,7 +10,7 @@
 			end: 'abc'
 		},
 		week: 123, //1 or 2
-	}
+	},
 	slots: 123,		//how many filled in slots
 	teams: [123, 123, 123, ]	//teams which signed up for this
 }
@@ -22,7 +22,15 @@
 	twitter: 'abc',
 	instagram: 'abc',
 	website: 'abc',
-	logo: 'abc'			//file name
+	logo: 'abc',		//file name
+	contacts: [
+		{	//first one is required
+			firstName: 'abc',
+			lastName: 'abc',
+			email: 'abc',
+			phone: 'abc'
+		},
+	]
 }
 
 //in collection leagueRegistrationKey
