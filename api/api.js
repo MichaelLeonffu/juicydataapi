@@ -12,11 +12,26 @@ app.get('/api/version', (req, res) => {
 
 //Connecting all APIs
 
-require('./accounts/accountsapi')(config, app, db)
+// require('./accounts/accountsapi')(config, app, db)
 // require('./events/eventsapi')(config, app, db)
 // require('./blog/blogsapi')(config, app, db)
 require('./leagues/leaguesapi')(config, app, db)
 require('./misc/miscapi')(config, app, db)
+
+app.post('/api/accounts/accounts/email-subscription', (req, res) => {
+
+	// req.body = {
+	// 	email: 'abc'
+	// }
+
+	console.log('result email thing', req.body)
+
+	db.collection('emails').insertOne({email: req.body.email}, (err, result) =>{
+		if(err)
+			return res.status(501).json({message: 'FIX LATTER!'})
+		res.status(200).json({message: result})	
+	})
+})
 
 // app.get('/api/illusive', (req, res) => {
 // 	res.status(301).redirect('/api/teapot')
