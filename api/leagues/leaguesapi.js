@@ -19,14 +19,10 @@ app.get('/api/leagues', (req, res) => {
 //getting league information
 app.get('/api/leagues/get-info', (req, res) => {
 
-	// req.query = {
-	// 	week : 123 //week number
-	// }
-
 	// res = {
 	// 	leagues: [
 	// 		{
-	// 			leagueName: 'abc',
+	// 			leagueWeek: 1,
 	// 			leagueMeets:[
 	// 				{
 	// 					_id: 'abc',		//league ID
@@ -38,37 +34,33 @@ app.get('/api/leagues/get-info', (req, res) => {
 	// 							start: 'abc',
 	// 							end: 'abc'
 	// 						},
+	// 						leagueName: 'abc',
 	// 						week: 123 //1 or 2
 	// 					},
-	// 					slots: 123,		//how many filled in slots
+	// 					slots: 123		//how many filled in slots
 	// 				},
 	// 			]
 	// 		},
 	// 	]
 	// }
 
-	if(typeof req.query.week == 'undefined')
-		return res.status(400).json({message: 'BAD REQUEST NO WEEK QUERY'})
-
-	console.log(req.query.week)
-
 	db.collection('leagues').aggregate(
 		[
-			{$match:{
-				'leagueInfo.week': Number(req.query.week)
+			{$sort:{
+				'leagueInfo.leagueName': 1 //doesnt seem to sort
 			}},
 			{$project:{
 				teams: 0
 			}},
 			{$group:{
-				_id:'$leagueInfo.leagueName',
+				_id:'$leagueInfo.week',
 				leagueMeets:{
 					$addToSet:'$$ROOT'
 				}
 			}},
 			{$project:{
 				_id: 0,
-				leagueName:'$_id',
+				leagueWeek:'$_id',
 				leagueMeets: '$leagueMeets'
 			}}
 		], 
@@ -82,6 +74,50 @@ app.get('/api/leagues/get-info', (req, res) => {
 					return res.status(500).json({message: 'some error making cursor'})
 				res.status(200).json({leagues: results})
 			})
+		}
+	)
+})
+
+//getting league information
+app.get('/api/leagues/get-league', (req, res) => {
+
+	// req.query = {
+	// 	leagueId: 'abc'
+	// }
+
+	// res = {
+	// 	_id: 'abc',		//league ID
+	// 	leagueInfo: {
+	// 		location: 'abc',
+	// 		address: 'abc',
+	// 		date: 'abc',
+	// 		time: {
+	// 			start: 'abc',
+	// 			end: 'abc'
+	// 		},
+	// 		leagueName: 'abc',
+	// 		week: 123 //1 or 2
+	// 	},
+	// 	slots: 123		//how many filled in slots
+	// }
+
+	if(!req.query || typeof req.query.leagueId == 'undefined')
+		res.status(400).json({message: 'No query for leagueId'})
+
+	db.collection('leagues').findOne(
+		{
+			_id: req.query.leagueId
+		},
+		{
+			projection:{
+				teams: 0
+			}
+		}, (err, result) => {
+			if(err)
+				return res.status(500).json({message: 'some error finding leagues'})
+			if(!result)
+				return res.status(400).json({message: 'no key matches'})
+			res.status(200).json(result)
 		}
 	)
 })
@@ -126,8 +162,10 @@ app.post('/api/leagues/sign-up', (req, res) => {
 	// 	twitter: 'abc',
 	// 	instagram: 'abc',
 	// 	website: 'abc',
-	// 	meetPick1: 'abc',
-	// 	meetPick2: 'abc',
+	// 	weekPick1: 'abc',	//same as the week number; this is the id of the event
+	// 	weekPick2: 'abc',
+	// 	weekPick3: 'abc',
+	// 	weekPick4: 'abc',
 	// 	logo: 'abc',
 	// 	contacts: [
 	// 		{
@@ -142,7 +180,7 @@ app.post('/api/leagues/sign-up', (req, res) => {
 	console.log(req.body)
 
 	//validation (can be booleans and will crash the program)
-	if(!req || !req.body || !req.body.jwt || !req.body.meetPick1 || !req.body.meetPick2 || !req.body.contacts) //required fields
+	if(!req || !req.body || !req.body.jwt || !req.body.weekPick1 || !req.body.weekPick2 || !req.body.weekPick3 || !req.body.weekPick4 || !req.body.contacts) //required fields
 		return res.status(400).json({message: 'incomplete required data'})
 
 	//parse contacts; remove any bad contacts
@@ -182,7 +220,8 @@ app.post('/api/leagues/sign-up', (req, res) => {
 				//check two leagues if they are valid combination of leagues
 				db.collection('leagues').findOne(
 					{
-						_id: req.body.meetPick1
+						_id: req.body.weekPick1, //I could also ask ti to query for slots
+						'leagueInfo.week': 1
 					},
 					(err, result1) =>{
 						if(err)
@@ -191,118 +230,182 @@ app.post('/api/leagues/sign-up', (req, res) => {
 							return res.status(400).json({message: 'invalid meet1, not found'})
 						db.collection('leagues').findOne(
 							{
-								_id: req.body.meetPick2
+								_id: req.body.weekPick2,
+								'leagueInfo.week': 2
 							},
 							(err, result2) =>{
 								if(err)
 									return res.status(500).json({message: 'some error getting meet2'})
 								if(!result2)
 									return res.status(400).json({message: 'invalid meet2, not found'})
-								if( //condituions to fail!
-									(result1.leagueInfo.week != 1 && result1.leagueInfo.week != 2) || 
-									(result2.leagueInfo.week != 1 && result2.leagueInfo.week != 2) ||
-									result1.leagueInfo.week == result2.leagueInfo.week) //each week needs to be either 1 or 2 and cannot be same
-									return res.status(400).json({message: 'weeks are either not 1 or 2; or the same value'})
-								if(result1.slots >= 14 || result2.slots >= 14) //check if full
-									return res.status(400).json({message: 'either meet week 1 or 2 is full'})
-								if(result1.leagueInfo.leagueName != result2.leagueInfo.leagueName) //if the events are not the same league
-									return res.status(400).json({message: 'events are not part of the same league'})
-								//all is good lets go boiz!
-								db.collection('socials').updateOne(
+								db.collection('leagues').findOne(
 									{
-										_id: Number(decoded.teamNumber)	//team number
+										_id: req.body.weekPick3,
+										'leagueInfo.week': 3
 									},
-									{
-										$set: {
-											_id: Number(decoded.teamNumber),	//team number
-											contacts: req.body.contacts,
-											facebook: req.body.facebook,
-											twitter: req.body.twitter,
-											instagram: req.body.instagram,
-											website: req.body.website,
-											logo: req.body.logo
-										}
-									},
-									{
-										upsert: true
-									},
-									(err, result) =>{
+									(err, result3) =>{
 										if(err)
-											return res.status(500).json({message: 'some error setting socials'})
-										console.log('making the socials', result.result)
-										//league 1
-										db.collection('leagues').updateOne(
+											return res.status(500).json({message: 'some error getting meet3'})
+										if(!result3)
+											return res.status(400).json({message: 'invalid meet3, not found'})
+										db.collection('leagues').findOne(
 											{
-												_id: req.body.meetPick1
+												_id: req.body.weekPick4,
+												'leagueInfo.week': 4
 											},
-											{
-												$inc: {slots: 1},
-												$push: {teams: Number(decoded.teamNumber)}
-											},
-											(err, result) =>{
+											(err, result4) =>{
 												if(err)
-													return res.status(500).json({message: 'some error setting league1 info'})
-												console.log('making the leagues1', result.result)
-												//league 2
-												db.collection('leagues').updateOne(
+													return res.status(500).json({message: 'some error getting meet4'})
+												if(!result4)
+													return res.status(400).json({message: 'invalid meet4, not found'})
+												if( //condituions to fail!
+													result1.leagueInfo.week != 1 || 
+													result2.leagueInfo.week != 2 ||
+													result3.leagueInfo.week != 3 ||
+													result4.leagueInfo.week != 4) //each week needs to be either 1 or 2 and cannot be same
+													return res.status(400).json({message: 'weeks are either not equal to picks'})
+												if(result1.slots >= 14 || result2.slots >= 14 || result3.slots >= 14 || result4.slots >= 14) //check if full
+													return res.status(400).json({message: 'either meet week 1, 2, 3, or 4 is full'})
+												if(result1.leagueInfo.leagueName != result4.leagueInfo.leagueName) //if the events are not the same league
+													return res.status(400).json({message: 'events 1 and 4 are not part of the same league'})
+												//all is good lets go boiz!
+												db.collection('socials').updateOne(
 													{
-														_id: req.body.meetPick2
+														_id: Number(decoded.teamNumber)	//team number
 													},
 													{
-														$inc: {slots: 1},
-														$push: {teams: Number(decoded.teamNumber)}
+														$set: {
+															_id: Number(decoded.teamNumber),	//team number
+															contacts: req.body.contacts,
+															facebook: req.body.facebook,
+															twitter: req.body.twitter,
+															instagram: req.body.instagram,
+															website: req.body.website,
+															logo: req.body.logo
+														}
 													},
-													(err, result) => {
+													{
+														upsert: true
+													},
+													(err, result) =>{
 														if(err)
-															return res.status(500).json({message: 'some error setting league2 info'})
-														console.log('making the leagues2', result.result)
-														//set their token to true used
-														db.collection('leagueRegistrationKey').updateOne(
+															return res.status(500).json({message: 'some error setting socials'})
+														console.log('making the socials', result.result)
+														//league 1
+														db.collection('leagues').updateOne(
 															{
-																key: req.body.jwt
+																_id: req.body.weekPick1
 															},
 															{
-																$set: {used: true}
+																$inc: {slots: 1},
+																$push: {teams: Number(decoded.teamNumber)}
 															},
 															(err, result) =>{
 																if(err)
-																	return res.status(500).json({message: 'somehow didnt set the update token status'})
-																nodemailer.createTestAccount((err, account) => {		//can be moved apart when new api is created
-																	const transporter = nodemailer.createTransport({
-																		service: config.nodemailer.service,
-																		auth:{
-																			user: config.nodemailer.email,
-																			pass: config.nodemailer.password
-																		}
-																	})
-
-																	const mailContent = generateEmailContentConfirm(
-																		decoded.teamNumber, 
-																		result1.leagueInfo.location,
-																		result1.leagueInfo.date,
-																		result1.leagueInfo.address,
-																		result1.leagueInfo.time.start + ' - ' + result1.leagueInfo.time.end,
-																		result2.leagueInfo.location,
-																		result2.leagueInfo.date,
-																		result2.leagueInfo.address,
-																		result2.leagueInfo.time.start + ' - ' + result2.leagueInfo.time.end
-																	)
-
-																	transporter.sendMail(
+																	return res.status(500).json({message: 'some error setting league1 info'})
+																console.log('making the leagues1', result.result)
+																//league 2
+																db.collection('leagues').updateOne(
 																	{
-																		from: config.nodemailer.name,
-																		to: req.body.contacts[0].email,
-																		subject: 'TEST: ' + mailContent.subject,
-																		html: mailContent.html
-																	}, 
-																		(err, info) =>{
-																			if(err)
-																				return console.log(err)
-																			console.log('Message sent: %s', info.messageId)
-																			res.status(200).json({message: 'good'})
-																		}
-																	)
-																})
+																		_id: req.body.weekPick2
+																	},
+																	{
+																		$inc: {slots: 1},
+																		$push: {teams: Number(decoded.teamNumber)}
+																	},
+																	(err, result) => {
+																		if(err)
+																			return res.status(500).json({message: 'some error setting league2 info'})
+																		console.log('making the leagues2', result.result)
+																		//league 3
+																		db.collection('leagues').updateOne(
+																			{
+																				_id: req.body.weekPick3
+																			},
+																			{
+																				$inc: {slots: 1},
+																				$push: {teams: Number(decoded.teamNumber)}
+																			},
+																			(err, result) =>{
+																				if(err)
+																					return res.status(500).json({message: 'some error setting league3 info'})
+																				console.log('making the leagues3', result.result)
+																				//league 4
+																				db.collection('leagues').updateOne(
+																					{
+																						_id: req.body.weekPick4
+																					},
+																					{
+																						$inc: {slots: 1},
+																						$push: {teams: Number(decoded.teamNumber)}
+																					},
+																					(err, result) =>{
+																						if(err)
+																							return res.status(500).json({message: 'some error setting league4 info'})
+																						console.log('making the leagues4', result.result)
+																						//set their token to true used
+																						db.collection('leagueRegistrationKey').updateOne(
+																							{
+																								key: req.body.jwt
+																							},
+																							{
+																								$set: {used: true}
+																							},
+																							(err, result) =>{
+																								if(err)
+																									return res.status(500).json({message: 'somehow didnt set the update token status'})
+																								nodemailer.createTestAccount((err, account) => {		//can be moved apart when new api is created
+																									const transporter = nodemailer.createTransport({
+																										service: config.nodemailer.service,
+																										auth:{
+																											user: config.nodemailer.email,
+																											pass: config.nodemailer.password
+																										}
+																									})
+
+																									const mailContent = generateEmailContentConfirm(
+																										decoded.teamNumber, 
+																										result1.leagueInfo.location,
+																										result1.leagueInfo.date,
+																										result1.leagueInfo.address,
+																										result1.leagueInfo.time.start + ' - ' + result1.leagueInfo.time.end,
+																										result2.leagueInfo.location,
+																										result2.leagueInfo.date,
+																										result2.leagueInfo.address,
+																										result2.leagueInfo.time.start + ' - ' + result2.leagueInfo.time.end,
+																										result3.leagueInfo.location,
+																										result3.leagueInfo.date,
+																										result3.leagueInfo.address,
+																										result3.leagueInfo.time.start + ' - ' + result3.leagueInfo.time.end,
+																										result4.leagueInfo.location,
+																										result4.leagueInfo.date,
+																										result4.leagueInfo.address,
+																										result4.leagueInfo.time.start + ' - ' + result4.leagueInfo.time.end
+																									)
+
+																									transporter.sendMail(
+																									{
+																										from: config.nodemailer.name,
+																										to: req.body.contacts[0].email,
+																										subject: 'TEST: ' + mailContent.subject,
+																										html: mailContent.html
+																									}, 
+																										(err, info) =>{
+																											if(err)
+																												return console.log(err)
+																											console.log('Message sent: %s', info.messageId)
+																											res.status(200).json({message: 'good'})
+																										}
+																									)
+																								})
+																							}
+																						)
+																					}
+																				)
+																			}
+																		)				
+																	}
+																)
 															}
 														)
 													}
@@ -322,9 +425,9 @@ app.post('/api/leagues/sign-up', (req, res) => {
 
 }
 
-function generateEmailContentConfirm(teamNumber, meetLocation1, meetDate1, meetAddress1, meetTime1, meetLocation2, meetDate2, meetAddress2, meetTime2){
+function generateEmailContentConfirm(teamNumber, meetLocation1, meetDate1, meetAddress1, meetTime1, meetLocation2, meetDate2, meetAddress2, meetTime2, meetLocation3, meetDate3, meetAddress3, meetTime3, meetLocation4, meetDate4, meetAddress4, meetTime4){
 	return {
-		subject: 'SDFTC 2018-2019 Registration Confirmation for Team ' + teamNumber,
+		subject: 'SDFTC 2018-2019 Selection Confirmation for Team ' + teamNumber,
 		html: `<table role="presentation" aria-hidden="true" cellspacing="0" cellpadding="0" border="0" align="center" width="100%"
 			style="border-collapse:collapse!important;border-spacing:0!important;margin:0 auto;max-width:600px;table-layout:fixed!important">
 			<tbody>
@@ -352,14 +455,13 @@ function generateEmailContentConfirm(teamNumber, meetLocation1, meetDate1, meetA
 											Hi <strong>Team ` + teamNumber + `!</strong>
 											<br>
 											<br>
-											This is a confirmation of the events you registered for in the <strong>2018-2019
-												San Diego FTC Rover Ruckus Season.</strong> Please note that these are only
-											your <strong>2nd and 3rd meets.</strong> Look for other emails from the region for
-											your 1st meet and league championship information.
+											This is a confirmation of the events and league you selected for the <strong>2018-2019
+												San Diego FTC Rover Ruckus Season.</strong>
 											<br>
 											<br>
-
-											<strong>Meet 2: </strong>
+											League: <strong>` +  + `</strong>
+											<br>
+											<strong>Meet 1: </strong></br>
 											<br>
 											Location: <strong>` + meetLocation1 + `</strong>
 											<br>
@@ -370,7 +472,7 @@ function generateEmailContentConfirm(teamNumber, meetLocation1, meetDate1, meetA
 											Time: <strong>` + meetTime1 + `</strong>
 											<br>
 											<br>
-											<strong>Meet 3: </strong>
+											<strong>Meet 2: </strong>
 											<br>
 											Location: <strong>` + meetLocation2 + `</strong>
 											<br>
@@ -379,6 +481,30 @@ function generateEmailContentConfirm(teamNumber, meetLocation1, meetDate1, meetA
 											Address: <strong>` + meetAddress2 + `</strong>
 											<br>
 											Time: <strong>` + meetTime2 + `</strong>
+											<br>
+											<br>
+
+											<strong>Meet 3: </strong>
+											<br>
+											Location: <strong>` + meetLocation3 + `</strong>
+											<br>
+											Date: <strong>` + meetDate3 + `</strong>
+											<br>
+											Address: <strong>` + meetAddress3 + `</strong>
+											<br>
+											Time: <strong>` + meetTime3 + `</strong>
+											<br>
+											<br>
+
+											<strong>Meet 4: </strong>
+											<br>
+											Location: <strong>` + meetLocation4 + `</strong>
+											<br>
+											Date: <strong>` + meetDate4 + `</strong>
+											<br>
+											Address: <strong>` + meetAddress4 + `</strong>
+											<br>
+											Time: <strong>` + meetTime4 + `</strong>
 											<br>
 											<br>
 
