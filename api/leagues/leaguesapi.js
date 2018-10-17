@@ -63,7 +63,7 @@ app.get('/api/leagues/get-info', (req, res) => {
 				leagueWeek:'$_id',
 				leagueMeets: '$leagueMeets'
 			}}
-		], 
+		],
 		{
 			teams: 0
 		}, (err, result) => {
@@ -194,6 +194,9 @@ app.post('/api/leagues/sign-up', (req, res) => {
 	for(let i = 1; i < req.body.contacts.length; i++)
 		if(req.body.contacts[i].firstName && req.body.contacts[i].lastName && req.body.contacts[i].email && req.body.contacts[i].phone)
 			contacts.push(req.body.contacts[i])
+
+	if(!checkEmailForm(req.body.contacts[0].email))
+		return res.status(400).json({message: 'BAD EMAIL FORM! try again'})
 
 	//fix
 	req.body.contacts = contacts
@@ -364,7 +367,8 @@ app.post('/api/leagues/sign-up', (req, res) => {
 																									})
 
 																									const mailContent = generateEmailContentConfirm(
-																										decoded.teamNumber, 
+																										decoded.teamNumber,
+																										result1.leagueInfo.leagueName,
 																										result1.leagueInfo.location,
 																										result1.leagueInfo.date,
 																										result1.leagueInfo.address,
@@ -383,8 +387,7 @@ app.post('/api/leagues/sign-up', (req, res) => {
 																										result4.leagueInfo.time.start + ' - ' + result4.leagueInfo.time.end
 																									)
 
-																									transporter.sendMail(
-																									{
+																									transporter.sendMail({
 																										from: config.nodemailer.name,
 																										to: req.body.contacts[0].email,
 																										subject: 'TEST: ' + mailContent.subject,
@@ -392,7 +395,7 @@ app.post('/api/leagues/sign-up', (req, res) => {
 																									}, 
 																										(err, info) =>{
 																											if(err)
-																												return console.log(err)
+																												return res.status(400).json({message: 'BAD! invalid email/email not sent! WHO HAS AUTH!?'})
 																											console.log('Message sent: %s', info.messageId)
 																											res.status(200).json({message: 'good'})
 																										}
@@ -425,7 +428,12 @@ app.post('/api/leagues/sign-up', (req, res) => {
 
 }
 
-function generateEmailContentConfirm(teamNumber, meetLocation1, meetDate1, meetAddress1, meetTime1, meetLocation2, meetDate2, meetAddress2, meetTime2, meetLocation3, meetDate3, meetAddress3, meetTime3, meetLocation4, meetDate4, meetAddress4, meetTime4){
+function checkEmailForm(email){
+	var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+	return re.test(String(email).toLowerCase())
+}
+
+function generateEmailContentConfirm(teamNumber, leagueName, meetLocation1, meetDate1, meetAddress1, meetTime1, meetLocation2, meetDate2, meetAddress2, meetTime2, meetLocation3, meetDate3, meetAddress3, meetTime3, meetLocation4, meetDate4, meetAddress4, meetTime4){
 	return {
 		subject: 'SDFTC 2018-2019 Selection Confirmation for Team ' + teamNumber,
 		html: `<table role="presentation" aria-hidden="true" cellspacing="0" cellpadding="0" border="0" align="center" width="100%"
@@ -459,9 +467,10 @@ function generateEmailContentConfirm(teamNumber, meetLocation1, meetDate1, meetA
 												San Diego FTC Rover Ruckus Season.</strong>
 											<br>
 											<br>
-											League: <strong>` +  + `</strong>
+											League: <strong>` + leagueName + `</strong>
 											<br>
-											<strong>Meet 1: </strong></br>
+											<br>
+											<strong>Meet 1: </strong>
 											<br>
 											Location: <strong>` + meetLocation1 + `</strong>
 											<br>
