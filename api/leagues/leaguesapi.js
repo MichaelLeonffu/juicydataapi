@@ -390,7 +390,7 @@ app.post('/api/leagues/sign-up', (req, res) => {
 																									transporter.sendMail({
 																										from: config.nodemailer.name,
 																										to: req.body.contacts[0].email,
-																										subject: 'TEST: ' + mailContent.subject,
+																										subject: mailContent.subject,
 																										html: mailContent.html
 																									}, 
 																										(err, info) =>{
