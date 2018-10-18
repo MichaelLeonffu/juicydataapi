@@ -464,7 +464,9 @@ function generateEmailContentConfirm(teamNumber, leagueName, meetLocation1, meet
 											<br>
 											<br>
 											This is a confirmation of the events and league you selected for the <strong>2018-2019
-												San Diego FTC Rover Ruckus Season.</strong>
+												San Diego FTC Rover Ruckus Season.</strong> Please remember that each team will be 
+												required to provide one volunteer for each event they attend. Tournament hosts will 
+												be sending you additional emails about your tournaments as they get closer.
 											<br>
 											<br>
 											League: <strong>` + leagueName + `</strong>
