@@ -435,7 +435,7 @@ function checkEmailForm(email){
 
 function generateEmailContentConfirm(teamNumber, leagueName, meetLocation1, meetDate1, meetAddress1, meetTime1, meetLocation2, meetDate2, meetAddress2, meetTime2, meetLocation3, meetDate3, meetAddress3, meetTime3, meetLocation4, meetDate4, meetAddress4, meetTime4){
 	return {
-		subject: 'SDFTC 2018-2019 Selection Confirmation for Team ' + teamNumber,
+		subject: 'SDFTC 2018-2019 League Selection Confirmation for Team ' + teamNumber,
 		html: `<table role="presentation" aria-hidden="true" cellspacing="0" cellpadding="0" border="0" align="center" width="100%"
 			style="border-collapse:collapse!important;border-spacing:0!important;margin:0 auto;max-width:600px;table-layout:fixed!important">
 			<tbody>
