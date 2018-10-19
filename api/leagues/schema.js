@@ -42,3 +42,10 @@
 	email: 'abc',
 	used: false	//turns true when used
 }
+
+//in collection teamsToSelect
+{
+	_id: 123, //teamNumber
+	name: 'abc',
+	email: 'abc'
+}

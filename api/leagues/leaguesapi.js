@@ -16,6 +16,41 @@ app.get('/api/leagues', (req, res) => {
 
 // require('./ftc/eventsftcapi')(config, app, db)
 
+app.get('/api/leagues/get-teams', (req, res) =>{
+
+
+	// res = 'teamNumber, name, email, status\n' //as csv
+
+	db.collection('teamsToSelect').aggregate(
+		[
+			{$lookup:{
+				from: 'socials', 
+				localField: '_id', 
+				foreignField: '_id', 
+				as: 'status'
+			}},{$addFields:{
+				status:{
+					$gt:[{$size: '$status'}, 0]
+				}
+			}}
+		],(err, result) =>{
+			if(err)
+				return res.status(500).send('some error geberatubg get-teams information')
+			result.toArray((err, results) => {
+				if(err)
+					return res.status(500).send('some error making cursor for get-teams')
+				let dataCSV = 'teamNumber, name, email, status\n'
+				for(let i = 0; i < results.length; i++)
+					dataCSV += results[i]._id + ', ' + results[i].name + ', ' + results[i].email + ', ' + results[i].status + '\n'
+				res.status(200).send(dataCSV)
+			})
+		}
+	)
+
+
+	// res.status(200).send('teamNumber, name, email, status\n'+'teamNumber2, name2, email2, status2')
+})
+
 //getting league information
 app.get('/api/leagues/get-info', (req, res) => {
 
@@ -65,7 +100,7 @@ app.get('/api/leagues/get-info', (req, res) => {
 			}}
 		],
 		{
-			teams: 0
+			teams: 0 //DO I NEED THIS CAN I REMOVE THIS?!?!?!?!?!?!?!??!?!??
 		}, (err, result) => {
 			if(err)
 				return res.status(500).json({message: 'some error finding leagues'})
