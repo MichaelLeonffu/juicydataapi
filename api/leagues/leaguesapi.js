@@ -16,6 +16,44 @@ app.get('/api/leagues', (req, res) => {
 
 // require('./ftc/eventsftcapi')(config, app, db)
 
+app.get('/api/leagues/get-leages', (req, res) =>{
+
+	db.collection('leagues').aggregate(
+		[
+			{$match:{
+				"leagueInfo.week": 1
+			}},
+			{$unwind:{
+				path: '$teams'
+			}},
+			{$lookup:{
+				from: 'socials', 
+				localField: 'teams', 
+				foreignField: '_id', 
+				as: 'teamSocial'
+			}},
+			{$unwind:{
+				path: '$teamSocial'
+			}},
+			{$group:{
+				_id: '$leagueInfo', 
+				teams: {
+					$push: '$teamSocial'
+				}
+			}}
+		], (err, result) =>{
+			if(err)
+				return res.status(500).send('some error getting get-leagues information')
+			result.toArray((err, results) => {
+				if(err)
+					return res.status(500).send('some error making cursor for get-leagues')
+				res.status(200).json(results)
+			})
+		}
+	)
+
+})
+
 app.get('/api/leagues/get-teams', (req, res) =>{
 
 
