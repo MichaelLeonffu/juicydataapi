@@ -16,7 +16,7 @@ app.get('/api/leagues', (req, res) => {
 
 // require('./ftc/eventsftcapi')(config, app, db)
 
-app.get('/api/leagues/get-leages', (req, res) =>{
+app.get('/api/leagues/get-leagues', (req, res) =>{
 
 	db.collection('leagues').aggregate(
 		[
