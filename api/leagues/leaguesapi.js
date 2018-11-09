@@ -32,8 +32,20 @@ app.get('/api/leagues/get-leagues', (req, res) =>{
 				foreignField: '_id', 
 				as: 'teamSocial'
 			}},
+			{$lookup:{
+				from: 'teams', 
+				localField: 'teams', 
+				foreignField: '_id', 
+				as: 'teamData'
+			}},
 			{$unwind:{
 				path: '$teamSocial'
+			}},
+			{$unwind:{
+				path: '$teamData'
+			}},
+			{$addFields:{
+				'teamSocial.teamInfo': '$teamData'
 			}},
 			{$group:{
 				_id: '$leagueInfo', 
