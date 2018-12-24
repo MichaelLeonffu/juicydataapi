@@ -48,8 +48,21 @@ app.get('/api/events/ftc/event/fetch_trees', (req, res) => {
 	res.status(201).send(trees)
 })
 
-app.get('/api/events/ftc/event/uploadSchedule', (req, res) => {		//change this to post when done
-	res.status(509).json({error: 'not implemented'})
+app.get('/api/events/ftc/event/read', (req, res) => {
+
+	db.collection('eventOut').findOne(
+		{
+			_id: req.query.eventId
+		},
+		(err, eventOut) => {
+			if(err)
+				return res.status(500).send(err)
+			res.status(200).json(eventOut)
+		}
+	)
+})
+
+app.post('/api/events/ftc/event/uploadSchedule', (req, res) => {
 
 	// res = {
 	// 	_id: 'abc', 					//eventKey
@@ -80,23 +93,19 @@ app.get('/api/events/ftc/event/uploadSchedule', (req, res) => {		//change this t
 
 	//midleware someplace in the middle there
 
-	console.log(req.body)
-	console.log("post body")
-
 	//$eq: req.query.teamNumber
 	db.collection('schedules').save(req.body, {w:1}, function(err, result){
 		if(err)
-			console.log(err)
-
-		console.log(result)
-
-		//if no error?
-		res.status(200).send("Got It")
+			return res.status(500).json({message: 'something is wrong'})
+		if(result.result.ok == 1)
+			return res.status(200).json({message: 'got It'})
+		else
+			return res.status(500).json({message: 'result is not ok'})
 	})
 
 })
 
-app.get('/api/events/ftc/event/uploadSync', (req, res) => {		//change this to post when done
+app.post('/api/events/ftc/event/uploadSync', (req, res) => {		//change this to post when done
 
 	// req = {
 	// 	body:{
@@ -131,10 +140,6 @@ app.get('/api/events/ftc/event/uploadSync', (req, res) => {		//change this to po
 	// 						penalty:{
 	// 							red: 123, //red alliance penalty score
 	// 							blue: 123 //blue alliance penalty score
-	// 						},
-	// 						final:{
-	// 							red: 123, //red alliance final score
-	// 							blue: 123 //blue alliance final score
 	// 						}
 	// 					}
 	// 				}
@@ -145,88 +150,88 @@ app.get('/api/events/ftc/event/uploadSync', (req, res) => {		//change this to po
 	// 	}
 	// }
 
-	req.body = {
-		seasonId:{
-			season: '2017-2018',
-			first: 'ftc'
-		},
-		eventKey: 'SOMEKEYHERE',
-		gameData:[
-			{
-				matchInformation:{
-					matchNumber: 123,
-					robotAlliance: 'blue',
-					teams: [123, 123]
-				},
-				"auto":{
-					"jewel": 2,
-					"glyph": 1,
-					"key": 0,
-					"park": 1
-				},
-				"driver":{
-					"glyph": 10,
-					"row": 3,
-					"column": 1,
-					"cipher": 0
-				},
-				"end":{
-					"relic1": 1,
-					"relic2": 0,
-					"relic3": 0,
-					"relicUp": 1,
-					"balanced": 1
-				}
-			},
-			{
-				matchInformation:{
-					matchNumber: 123,
-					robotAlliance: 'red',
-					teams: [123, 123]
-				},
-				"auto":{
-					"jewel": 2,
-					"glyph": 2,
-					"key": 1,
-					"park": 0
-				},
-				"driver":{
-					"glyph": 3,
-					"row": 1,
-					"column": 0,
-					"cipher": 0
-				},
-				"end":{
-					"relic1": 1,
-					"relic2": 0,
-					"relic3": 0,
-					"relicUp": 1,
-					"balanced": 2
-				}
-			}
-		],
-		matchData:[
-			{
-				matchInformation:{
-					matchNumber: 123,
-					teams: {
-						red1: 123,
-						red2: 123,
-						blue1: 123,
-						blue2: 123
-					}
-				},
-				resultInformation:{
-					score:{
-						penalty:{
-							red: 123, //red alliance penalty score
-							blue: 123 //blue alliance penalty score
-						}
-					}
-				}
-			}
-		]
-	}
+	// req.body = {
+	// 	seasonId:{
+	// 		season: '2017-2018',
+	// 		first: 'ftc'
+	// 	},
+	// 	eventKey: 'SOMEKEYHERE',
+	// 	gameData:[
+	// 		{
+	// 			matchInformation:{
+	// 				matchNumber: 123,
+	// 				robotAlliance: 'blue',
+	// 				teams: [123, 123]
+	// 			},
+	// 			"auto":{
+	// 				"jewel": 2,
+	// 				"glyph": 1,
+	// 				"key": 0,
+	// 				"park": 1
+	// 			},
+	// 			"driver":{
+	// 				"glyph": 10,
+	// 				"row": 3,
+	// 				"column": 1,
+	// 				"cipher": 0
+	// 			},
+	// 			"end":{
+	// 				"relic1": 1,
+	// 				"relic2": 0,
+	// 				"relic3": 0,
+	// 				"relicUp": 1,
+	// 				"balanced": 1
+	// 			}
+	// 		},
+	// 		{
+	// 			matchInformation:{
+	// 				matchNumber: 123,
+	// 				robotAlliance: 'red',
+	// 				teams: [123, 123]
+	// 			},
+	// 			"auto":{
+	// 				"jewel": 2,
+	// 				"glyph": 2,
+	// 				"key": 1,
+	// 				"park": 0
+	// 			},
+	// 			"driver":{
+	// 				"glyph": 3,
+	// 				"row": 1,
+	// 				"column": 0,
+	// 				"cipher": 0
+	// 			},
+	// 			"end":{
+	// 				"relic1": 1,
+	// 				"relic2": 0,
+	// 				"relic3": 0,
+	// 				"relicUp": 1,
+	// 				"balanced": 2
+	// 			}
+	// 		}
+	// 	],
+	// 	matchData:[
+	// 		{
+	// 			matchInformation:{
+	// 				matchNumber: 123,
+	// 				teams: {
+	// 					red1: 123,
+	// 					red2: 123,
+	// 					blue1: 123,
+	// 					blue2: 123
+	// 				}
+	// 			},
+	// 			resultInformation:{
+	// 				score:{
+	// 					penalty:{ //total = partial + penalty: partial red + pentaly red
+	// 						red: 123, //red alliance penalty score
+	// 						blue: 123 //blue alliance penalty score
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	]
+	// }
 
 	db.collection('seasons').findOne(
 		{
@@ -242,43 +247,38 @@ app.get('/api/events/ftc/event/uploadSync', (req, res) => {		//change this to po
 			}
 		},
 		(err, result) => {
-			if(err){
-				console.log(err)
-				res.status(500).send(err)
-				return
-			}
-			interpretSeasonFormatGameData(result)
+			if(err)
+				return res.status(500).send(err)
+			else
+				interpretSeasonFormatGameData(result)
 		}
 	)
 
 	function interpretSeasonFormatGameData(seasonData){
 		//check if any season matched
-		if(seasonData == null){
-			res.status(406).json({error: 'no season found'})
-			return
-		}
+		if(seasonData == null)
+			return res.status(406).json({error: 'no season found'})
 
 		//first check if all data is present
-		if(req.body.gameData != null && req.body.gameData.constructor === Array && req.body.gameData.length > 0)
-			req.body.gameData.forEach((dataBit) => {
-				seasonData.game.forEach((periodName) => {
-					if(dataBit[periodName.period] == null){	//checks if period is undefined or null
-						res.status(406).json({error: 'schema is not correct for season: missing period: ' + periodName.period})
-						return
-					}
-					if(dataBit[periodName.period][periodName.name] == null){ //checks if name is undefined or null
-						res.status(406).json({error: 'schema is not correct for season: missing name in ' + periodName.period + ': ' + periodName.name})
-						return
-					}
-					if(!Number.isInteger(dataBit[periodName.period][periodName.name])){ //checks if value is a number
-						res.status(406).json({error: 'data is not a number: ' + periodName.period + ': ' + periodName.name})
-						return
-					}
+		try{
+			if(req.body.gameData != null && req.body.gameData.constructor === Array && req.body.gameData.length > 0)
+				req.body.gameData.forEach((dataBit) => {
+					seasonData.game.forEach((periodName) => {
+						if(dataBit[periodName.period] == null){	//checks if period is undefined or null
+							throw {error: 'schema is not correct for season: missing period: ' + periodName.period}
+						}
+						if(dataBit[periodName.period][periodName.name] == null){ //checks if name is undefined or null
+							throw {error: 'schema is not correct for season: missing name in ' + periodName.period + ': ' + periodName.name}
+						}
+						if(!Number.isInteger(dataBit[periodName.period][periodName.name])){ //checks if value is a number
+							throw {error: 'data is not a number: ' + periodName.period + ': ' + periodName.name}
+						}
+					})
 				})
-			})
-		else{
-			res.status(406).json({error: 'no game data found'})
-			return
+			else
+				throw {error: 'no game data found'}
+		}catch(e){
+			return res.status(406).json({error: e.error})
 		}
 
 		var validationLog = []
@@ -546,14 +546,49 @@ app.get('/api/events/ftc/event/uploadSync', (req, res) => {		//change this to po
 		})
 
 		var util = require('util')
-		console.log(util.inspect(req.body, false, null))
-		console.log(util.inspect(gameData, false, null))
-		console.log(util.inspect(matchData, false, null))
+		// console.log(util.inspect(req.body, false, null))
+		// console.log(util.inspect(gameData, false, null))
+		// console.log(util.inspect(matchData, false, null))
 
-		if(validationLog.length == 0)
-			res.status(200).json({rawData: {}})
-		else
-			res.status(206).json({warning: validationLog})
+		let status = {
+			gameDataStat: gameData.length,
+			matchDataStat: matchData.length,
+			isDone: function isDone(){
+				return this.gameDataStat === 0 && this.matchDataStat === 0;
+			}
+		}
+
+		gameData.forEach((gameDat) =>{
+			db.collection('gameData').save(gameDat, (err, result) => {
+				if(err)
+					return res.status(500).send(err)
+				status.gameDataStat--
+				if(status.isDone())
+					finalStep(validationLog)
+			})
+		})
+
+		matchData.forEach((matchDat) =>{
+			db.collection('matchData').save(matchDat, (err, result) => {
+				if(err)
+					return res.status(500).send(err)
+				status.matchDataStat--
+				if(status.isDone())
+					finalStep(validationLog)
+			})
+		})
+	}
+
+	function finalStep(validationLog){
+		require('./../orangeFarm/orangeFarm')({db:db}, {orchard: req.body.eventKey, season: req.body.seasonId}, function(farmReport){
+			console.log('farmReport:', farmReport, 'At:', new Date())
+			//this is good
+			if(validationLog.length == 0)
+				res.status(200).json({message: "Anna Li!"})
+			else
+				res.status(206).json({warning: validationLog})
+			//but when is it bad?
+		})
 	}
 
 })

@@ -24,7 +24,8 @@ app.get('/api/events/ftc/seasons', (req, res) => {
 	if(!req.body.format)
 		fields = {
 			'game.period': 1,
-			'game.name': 1
+			'game.name': 1,
+			'game.type': 1
 		}
 
 	if(req.body.season)
@@ -79,7 +80,10 @@ app.get('/api/events/ftc/seasons', (req, res) => {
 		seasonData.game.forEach((game) => {
 			if(!temp.schema[game.period])
 				temp.schema[game.period] = {}
-			temp.schema[game.period][game.name] = 123
+			if(game.type == 'number')
+				temp.schema[game.period][game.name] = 123
+			if(game.type == 'boolean')
+				temp.schema[game.period][game.name] = false
 		})
 
 		return temp
