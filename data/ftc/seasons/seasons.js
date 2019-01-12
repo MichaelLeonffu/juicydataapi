@@ -20,21 +20,22 @@ MongoClient.connect(configDB.url, function(err, client){
 	var db = client.db(configDB.db)
 
 	console.log('\nStarting Upload: ')
-	saveSeasonData(data, db)
-
-	client.close()
+	saveSeasonData(data, db, client)
 })
 
-function saveSeasonData(seasonData, db){
-	if(seasonData.length <= 0)
+function saveSeasonData(seasonData, db, client){
+	if(seasonData.length <= 0){
 		return
-	else
+	}else
 		db.collection('seasons').save(seasonData[0], (err, result) => {
 			if(err)
 				console.log(err)
 			console.log(seasonData[0]._id, seasonData[0].name)
 			console.log(result.result)
 			seasonData.shift()
+			saveSeasonData(seasonData, db, client)
+			console.log("Done!") //fix this last bit here latter it loops!
+			return client.close()
 		})
 }
 
@@ -253,6 +254,156 @@ const data = [
 				conditions: 'none',
 				type: 'number',
 				value: 20,
+				validation: {
+					min: 0,
+					max: 2
+				}
+			}
+		]
+	},
+	{
+		_id:{ //TDB
+			season: '2018-2019',
+			first: 'ftc'
+		},
+		name: 'Rover Ruckus',
+		description: 'ADD SOEMTHING HERE FOR ME PLS',
+		game:[
+			{
+				period: 'auto',
+				name: 'landing',
+				description: 'Landing',
+				displayName: 'Landing',
+				abbreviation: 'LND',
+				conditions: 'TBD',
+				type: 'number',
+				value: 30,
+				validation: {
+					min: 0,
+					max: 2
+				}
+			},
+			{
+				period: 'auto',
+				name: 'sampling',
+				description: 'Sampling',
+				displayName: 'Sampling',
+				abbreviation: 'SMP',
+				conditions: 'TBD',
+				type: 'number',
+				value: 25,
+				validation: {
+					min: 0,
+					max: 2
+				}
+			},
+			{
+				period: 'auto',
+				name: 'claiming',
+				description: 'Claiming',
+				displayName: 'Claiming',
+				abbreviation: 'CLM',
+				conditions: 'TBD',
+				type: 'number',
+				value: 15,
+				validation: {
+					min: 0,
+					max: 2
+				}
+			},
+			{
+				period: 'auto',
+				name: 'parking',
+				description: 'Parking',
+				displayName: 'Parking',
+				abbreviation: 'PRK',
+				conditions: 'TBD',
+				type: 'number',
+				value: 10,
+				validation: {
+					min: 0,
+					max: 2
+				}
+			},
+			{
+				period: 'driver',
+				name: 'goldMineral',
+				description: 'GoldMineral',
+				displayName: 'GoldMineral',
+				abbreviation: 'GMN',
+				conditions: 'TBD',
+				type: 'number',
+				value: 5,
+				validation: {
+					min: 0,
+					max: 200
+				}
+			},
+			{
+				period: 'driver',
+				name: 'silverMineral',
+				description: 'SilverMineral',
+				displayName: 'SilverMineral',
+				abbreviation: 'SMN',
+				conditions: 'TBD',
+				type: 'number',
+				value: 5,
+				validation: {
+					min: 0,
+					max: 200
+				}
+			},
+			{
+				period: 'driver',
+				name: 'anyMineral',
+				description: 'AnyMineral',
+				displayName: 'AnyMineral',
+				abbreviation: 'AMN',
+				conditions: 'TBD',
+				type: 'number',
+				value: 2,
+				validation: {
+					min: 0,
+					max: 400
+				}
+			},
+			{
+				period: 'end',
+				name: 'latched',
+				description: 'Latched PER ROBOT',
+				displayName: 'Latched',
+				abbreviation: 'LTC',
+				conditions: 'TBD',
+				type: 'number',
+				value: 50,
+				validation: {
+					min: 0,
+					max: 2
+				}
+			},
+			{
+				period: 'end',
+				name: 'parkedCrater',
+				description: 'ParkedCrater PER ROBOT',
+				displayName: 'ParkedCrater',
+				abbreviation: 'PKC',
+				conditions: 'TBD',
+				type: 'number',
+				value: 15,
+				validation: {
+					min: 0,
+					max: 2
+				}
+			},
+			{
+				period: 'end',
+				name: 'parkedCompletelyCrater',
+				description: 'ParkedCompletelyCrater PER ROBOT',
+				displayName: 'ParkedCompletelyCrater',
+				abbreviation: 'PCC',
+				conditions: 'TBD',
+				type: 'number',
+				value: 25,
 				validation: {
 					min: 0,
 					max: 2
