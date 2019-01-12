@@ -56,7 +56,7 @@ app.get('/api/events/ftc/event/read', (req, res) => {
 		},
 		(err, eventOut) => {
 			if(err)
-				return res.status(500).send(err)\
+				return res.status(500).send(err)
 			if(eventOut === null)
 				res.status(400).json({error:'Event not found'})
 			else
