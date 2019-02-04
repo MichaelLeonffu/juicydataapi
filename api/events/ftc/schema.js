@@ -160,8 +160,8 @@
 		first: 'abc'				//as fll, ftc, frc
 	},
 	offical: true, 					//false if event is private and for personal use
-	protocol: 'abc',				//leagueMeet, regional, private, etc (add more latter)
-	series: 'abc',					//spesific pharse relating this event to other events of the same series; this similar to _id; i.e sanDiego
+	seriesType: 'abc',				//league, regional, private, etc (add more latter)
+	region: 'abc',					//spesific pharse relating this event to other events of the same series; this similar to _id; i.e sanDiego
 	administration:{
 		coordinator: ObjectId(), 	//mongodb unique id of user
 		moderators:[
