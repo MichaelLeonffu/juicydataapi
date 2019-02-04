@@ -371,7 +371,14 @@
 {
 	_id: 'abc',							//same as the inner regions ids
 	name: 'abc',						//region group name
-	regions:['abc', 'abc', 'abc',],		//ids of the regions
+	regions:[							//ids of the regions
+		{
+			_id: 'abc',					//same as the regionsGroup
+			authorizationType: 'abc',	//i.e 'offical'/'scrimage'
+			season: 'abc',				//season for this region data
+			seriesType: 'abc'			//'league', 'quailfyer', ...
+		},
+	],
 	info:{
 		admin: ObjectId(),				//user id
 		createdOn: ISODate();
