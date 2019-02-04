@@ -353,18 +353,20 @@
 //in collection 'teams'
 {
 	_id: 123,					//team Number
-	team_key: 123,				//also team number
-	region_key: 'abc',			//state?
-	league_key: 'abc',			//not quite sure what this is... maybe for leagues?
-	team_number: 123,			//Team Number for reals?
-	team_name_short: 'abc',		//Real team name?
-	team_name_long: 'abc',		//Team Name (fake?) all are nothing
-	robot_name: 'abc',			//Robot name; but thses are all blank.
-	city: 'abc',				//city name?
-	state_prov: 'abc',			//State too? abrev
-	country: 'abc',				//Country abrviation
-	rookie_year: 123,			//Year team was established; 0 if no year
-	website: 'abc'				//website string?
+	name: 'abc',				//team name
+	school: 'abc',				//afflication
+	city: 'abc',				//city name
+	state: 'abc',				//state
+	country: 'abc',				//country abrviation
+	rookie: 123,				//year team was established; 0 if no year
+	socials:{
+		contacts:[ObjectId(), ObjectId(), ObjectId(),], //contacts, where primary is the first one
+		facebook: 'abc',
+		instagram: 'abc',
+		twitter: 'abc',
+		website: 'abc',
+		logo: 'abc',			//image location using image logic TODO.
+	}
 }
 
 //in collection 'regionsGroup'
