@@ -12,10 +12,10 @@
 		first: 'abc',
 		last: 'abc'
 	},
-	rookieYear: 2015, // can be converted to/from total years of experience
-	experience: 3 // years. Periodically updated based on rookieYear
-	graduationYear: 2017, // can be converted to/from current year in school
-	educationLevel: 'abc' // Periodically updated based on graduationYear
+	rookieYear: 2015, 		// can be converted to/from total years of experience
+	experience: 3,			// years. Periodically updated based on rookieYear
+	graduationYear: 2017, 	// can be converted to/from current year in school
+	educationLevel: 'abc', 	// Periodically updated based on graduationYear
 	gender: 'abc',
 	firstInvolvement: ['abc'],
 	firstProgram: ['abc']
