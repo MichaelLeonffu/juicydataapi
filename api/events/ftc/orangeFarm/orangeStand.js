@@ -91,12 +91,12 @@ var orangeStand = function(mongodb, orchard, pickedRankingOranges, pickedMatchHi
 			},
 			qualifyingPoints: pickedRankingOranges[i].qualifyingPoints,
 			rankingPoints: pickedRankingOranges[i].rankingPoints,
-			averageScore: calculatedJuice == 'Not juicy enough' ? 'NJE' :calculatedJuice.offensiveOranges.juice[String(pickedRankingOranges[i]._id)],
-			averageMarginalScore: calculatedJuice == 'Not juicy enough' ? 'NJE' :calculatedJuice.marginalOranges.juice[String(pickedRankingOranges[i]._id)],
+			averageScore: calculatedJuice == 'Not juicy enough' ? 0 :calculatedJuice.offensiveOranges.juice[String(pickedRankingOranges[i]._id)],
+			averageMarginalScore: calculatedJuice == 'Not juicy enough' ? 0 :calculatedJuice.marginalOranges.juice[String(pickedRankingOranges[i]._id)],
 			average:{
-				auto: 		calculatedJuice == 'Not juicy enough' ? 'NJE' :calculatedJuice.scoreAutoOranges		.juice[String(pickedRankingOranges[i]._id)],
-				driver: 	calculatedJuice == 'Not juicy enough' ? 'NJE' :calculatedJuice.scoreDriverOranges		.juice[String(pickedRankingOranges[i]._id)],
-				end: 		calculatedJuice == 'Not juicy enough' ? 'NJE' :calculatedJuice.scoreEndOranges			.juice[String(pickedRankingOranges[i]._id)]
+				auto: 		calculatedJuice == 'Not juicy enough' ? 0 :calculatedJuice.scoreAutoOranges		.juice[String(pickedRankingOranges[i]._id)],
+				driver: 	calculatedJuice == 'Not juicy enough' ? 0 :calculatedJuice.scoreDriverOranges		.juice[String(pickedRankingOranges[i]._id)],
+				end: 		calculatedJuice == 'Not juicy enough' ? 0 :calculatedJuice.scoreEndOranges			.juice[String(pickedRankingOranges[i]._id)]
 			}
 		}
 	}
