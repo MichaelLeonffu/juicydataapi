@@ -180,7 +180,7 @@ var orangeStand = function(mongodb, orchard, pickedRankingOranges, pickedMatchHi
 
 		//NEW -- featuring seasonal Oranges!!!!
 		for(let j = 0; j < seasonInterface.length; j++){
-			averageScores[i].gameAverages[seasonInterface[j].period][seasonInterface[j].name] = calculatedJuice == 'Not juicy enough' ? 'NJE' :calculatedJuice[seasonInterface[j].period+seasonInterface[j].name].juice[String(pickedRankingOranges[i]._id)]
+			averageScores[i].gameAverages[seasonInterface[j].period][seasonInterface[j].name] = calculatedJuice == 'Not juicy enough' ? 0 :calculatedJuice[seasonInterface[j].period+seasonInterface[j].name].juice[String(pickedRankingOranges[i]._id)]
 		}
 		averageScores[i].gameAverages
 	}
