@@ -58,9 +58,76 @@ app.get('/api/events/ftc/event/read', (req, res) => {
 			if(err)
 				return res.status(500).send(err)
 			if(eventOut === null)
-				res.status(400).json({error:'Event not found'})
+				db.collection('events').findOne(
+					{
+						_id: req.query.eventId
+					},
+					(err, eventsOut) => {
+						if(err)
+							return res.status(500).send(err)
+						if(eventsOut === null)
+							res.status(400).json({error:'Event not found'})
+						else{
+							eventsOut.lastUpdated = new Date()
+							res.status(200).json(eventsOut)
+						}
+					}
+				)
 			else
 				res.status(200).json(eventOut)
+		}
+	)
+})
+
+app.get('/api/events/ftc/event/schedule/read', (req, res) => {
+
+	db.collection('schedules').findOne(
+		{
+			_id: req.query.eventId
+		},
+		(err, schedulesOut) => {
+			if(err)
+				return res.status(500).send(err)
+			if(schedulesOut === null)
+				res.status(400).json({error:'Schedules not found'})
+			else{
+				var teamList = []
+				function isIn(teamList, teamNumber){
+					for(let i = 0; i < teamList.length; i++)
+						if(teamList[i] == teamNumber)
+							return true;
+					return false;
+				}
+				for(let i = 0; i < schedulesOut.schedule.length; i++){
+					if(!isIn(teamList, schedulesOut.schedule[i].teams.red1.teamNumber))
+						teamList.push(schedulesOut.schedule[i].teams.red1.teamNumber)
+					if(!isIn(teamList, schedulesOut.schedule[i].teams.red2.teamNumber))
+						teamList.push(schedulesOut.schedule[i].teams.red2.teamNumber)
+					if(!isIn(teamList, schedulesOut.schedule[i].teams.blue1.teamNumber))
+						teamList.push(schedulesOut.schedule[i].teams.blue1.teamNumber)
+					if(!isIn(teamList, schedulesOut.schedule[i].teams.blue2.teamNumber))
+						teamList.push(schedulesOut.schedule[i].teams.blue2.teamNumber)
+				}
+				console.log(teamList)
+				db.collection('teams').find(
+					{
+						_id:{
+							$in: teamList
+						}
+					},
+					(err, teamsOut) => {
+						if(err)
+							return res.status(500).send(err)
+						if(teamsOut === null)
+							res.status(400).json({error:'Teams not found'})
+						else{
+							teamsOut.toArray( (err, teamsNames) =>{
+								res.status(200).json({schedules: schedulesOut, teams: teamsNames})
+							})
+						}
+					}
+				)
+			}
 		}
 	)
 })
@@ -235,6 +302,15 @@ app.post('/api/events/ftc/event/uploadSync', (req, res) => {		//change this to p
 	// 		}
 	// 	]
 	// }
+
+	// console.log(req.body.rankings)
+
+	db.collection('rankings').save(
+		{
+			_id: req.body.eventKey,
+			rankings: req.body.rankings
+		}
+	)
 
 	db.collection('seasons').findOne(
 		{

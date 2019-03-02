@@ -40,17 +40,19 @@ function orangeFarm(mongodb, orchardSeason, farmReport){
 	orangePicker.orangePickerAverageScores(orchard, function(pickedAvergeScoresOranges){
 	orangePicker.orangePickerMatchHistory(orchard, function(pickedMatchHistoryOranges){
 	orangePicker.orangePickerOrchard(orchard, function(pickedOrchardOranges){
+	orangePicker.orangePickerScheduleAndRankings(orchard, function(pickedScheduleAndRankingsOranges){
 	orangePicker.orangePickerSeason(orchardSeason.season, function(pickedSeasonOranges){
 		orangePeeler.teamInfluencePeeler({season: pickedSeasonOranges, average: pickedAvergeScoresOranges}, function(peeledOranges){
 			algorithms.juicyCalculator(peeledOranges, function(calculatedJuice){
 				//console.log('calculatedJuice', calculatedJuice)
-				orangeStand(mongodb, orchard, pickedRankingOranges, pickedMatchHistoryOranges, calculatedJuice, pickedOrchardOranges, pickedSeasonOranges, function(report){
+				orangeStand(mongodb, orchard, pickedRankingOranges, pickedMatchHistoryOranges, calculatedJuice, pickedOrchardOranges, pickedScheduleAndRankingsOranges, pickedSeasonOranges, function(report){
 					console.log('Operation orangeFarm time(Milliseconds):', new Date(new Date()-farmTimer).getMilliseconds())	//Timmer doens't seem to acually work?
 					console.log('[DONE]-orangeFarm')
 					farmReport(report) //This is done
 				})
 			}, true, 2) //Toggle for the console logs in juicyCalculator; 1 is for 1 place after decmiel
 		})
+	})
 	})
 	})
 	})

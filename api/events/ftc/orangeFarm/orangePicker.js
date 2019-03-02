@@ -30,6 +30,35 @@ function orangePickerOrchard(orchard, oranges){
 	)
 }
 
+function orangePickerScheduleAndRankings(orchard, oranges){
+	console.log('[START]-orangePickerScheduleAndRankings')
+	var pickerTimer = new Date()
+	mongodb.db.collection('rankings').findOne(
+		{_id: orchard},
+		function(err, pickedOrangesRankings){
+			if(err){
+				console.log(err)
+			}else{
+				mongodb.db.collection('schedules').findOne(
+					{_id: orchard},
+					function(err, pickedOrangesSchedules){
+						console.log('Operation orangePickerScheduleAndRankings time(Milliseconds):',new Date(new Date()-pickerTimer).getMilliseconds())
+						console.log('[DONE]-orangePickerScheduleAndRankings')
+						if(err){
+							console.log(err)
+						}else{
+							pickedOranges = {schedule: pickedOrangesSchedules, rankings: pickedOrangesRankings}
+							console.log(orchard)
+							console.log(pickedOranges)
+							oranges(pickedOranges)	//Thses oranges don't need peeling;	this is the call back.
+						}
+					}
+				)
+			}
+		}
+	)
+}
+
 function orangePickerSeason(season, oranges){
 	console.log('[START]-orangePickerSeason')
 	var pickerTimer = new Date()
@@ -573,7 +602,8 @@ return {
 	orangePickerMatchHistory: orangePickerMatchHistory,
 	orangePickerAverageScores: orangePickerAverageScores,
 	orangePickerOrchard: orangePickerOrchard,
-	orangePickerSeason: orangePickerSeason
+	orangePickerSeason: orangePickerSeason,
+	orangePickerScheduleAndRankings: orangePickerScheduleAndRankings
 }
 
 }
