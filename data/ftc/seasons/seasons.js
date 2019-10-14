@@ -263,60 +263,32 @@ const data = [
 	},
 	{
 		_id:{ //TDB
-			season: '2018-2019',
+			season: '2019-2020',
 			first: 'ftc'
 		},
-		name: 'Rover Ruckus',
+		name: 'Sky Stone',
 		description: 'ADD SOEMTHING HERE FOR ME PLS',
 		game:[
 			{
 				period: 'auto',
-				name: 'landing',
-				description: 'Landing',
-				displayName: 'Landing',
-				abbreviation: 'LND',
+				name: 'reposition',
+				description: 'Reposition',
+				displayName: 'Reposition',
+				abbreviation: 'RFB',
 				conditions: 'TBD',
 				type: 'number',
-				value: 30,
+				value: 10,
 				validation: {
 					min: 0,
-					max: 2
+					max: 1
 				}
 			},
 			{
 				period: 'auto',
-				name: 'sampling',
-				description: 'Sampling',
-				displayName: 'Sampling',
-				abbreviation: 'SMP',
-				conditions: 'TBD',
-				type: 'number',
-				value: 25,
-				validation: {
-					min: 0,
-					max: 2
-				}
-			},
-			{
-				period: 'auto',
-				name: 'claiming',
-				description: 'Claiming',
-				displayName: 'Claiming',
-				abbreviation: 'CLM',
-				conditions: 'TBD',
-				type: 'number',
-				value: 15,
-				validation: {
-					min: 0,
-					max: 2
-				}
-			},
-			{
-				period: 'auto',
-				name: 'parking',
-				description: 'Parking',
-				displayName: 'Parking',
-				abbreviation: 'PRK',
+				name: 'skystones',
+				description: 'Skystones',
+				displayName: 'Skystones',
+				abbreviation: 'SKY',
 				conditions: 'TBD',
 				type: 'number',
 				value: 10,
@@ -326,56 +298,98 @@ const data = [
 				}
 			},
 			{
-				period: 'driver',
-				name: 'goldMineral',
-				description: 'GoldMineral',
-				displayName: 'GoldMineral',
-				abbreviation: 'GMN',
-				conditions: 'TBD',
-				type: 'number',
-				value: 5,
-				validation: {
-					min: 0,
-					max: 200
-				}
-			},
-			{
-				period: 'driver',
-				name: 'silverMineral',
-				description: 'SilverMineral',
-				displayName: 'SilverMineral',
-				abbreviation: 'SMN',
-				conditions: 'TBD',
-				type: 'number',
-				value: 5,
-				validation: {
-					min: 0,
-					max: 200
-				}
-			},
-			{
-				period: 'driver',
-				name: 'anyMineral',
-				description: 'AnyMineral',
-				displayName: 'AnyMineral',
-				abbreviation: 'AMN',
+				period: 'auto',
+				name: 'deliverStones',
+				description: 'DeliverStones',
+				displayName: 'DeliverStones',
+				abbreviation: 'DS',
 				conditions: 'TBD',
 				type: 'number',
 				value: 2,
 				validation: {
 					min: 0,
-					max: 400
+					max: 4 //not sure about this one boiz
+				}
+			},
+			{
+				period: 'auto',
+				name: 'stackedStones',
+				description: 'StackedStones',
+				displayName: 'StackedStones',
+				abbreviation: 'SS',
+				conditions: 'TBD',
+				type: 'number',
+				value: 4,
+				validation: {
+					min: 0,
+					max: 4
+				}
+			},
+			{
+				period: 'auto',
+				name: 'skybridge',
+				description: 'Skybridge',
+				displayName: 'Skybridge',
+				abbreviation: 'SB',
+				conditions: 'TBD',
+				type: 'number',
+				value: 5,
+				validation: {
+					min: 0,
+					max: 2 //only counts once
+				}
+			},
+			{
+				period: 'driver',
+				name: 'deliverStones',
+				description: 'DeliverStones',
+				displayName: 'DeliverStones',
+				abbreviation: 'DDS',
+				conditions: 'TBD',
+				type: 'number',
+				value: 1,
+				validation: {
+					min: 0,
+					max: 60
+				}
+			},
+			{
+				period: 'driver',
+				name: 'stackedStones',
+				description: 'StackedStones',
+				displayName: 'StackedStones',
+				abbreviation: 'DSS',
+				conditions: 'TBD',
+				type: 'number',
+				value: 1,
+				validation: {
+					min: 0,
+					max: 1
+				}
+			},
+			{
+				period: 'driver',
+				name: 'skyscraper',
+				description: 'Skyscraper',
+				displayName: 'Skyscraper',
+				abbreviation: 'SCR',
+				conditions: 'TBD',
+				type: 'number',
+				value: 2,
+				validation: {
+					min: 0,
+					max: 64 //rough guess
 				}
 			},
 			{
 				period: 'end',
-				name: 'latched',
-				description: 'Latched PER ROBOT',
-				displayName: 'Latched',
-				abbreviation: 'LTC',
+				name: 'capping',
+				description: 'Capping',
+				displayName: 'Capping',
+				abbreviation: 'CAP',
 				conditions: 'TBD',
 				type: 'number',
-				value: 50,
+				value: 5,
 				validation: {
 					min: 0,
 					max: 2
@@ -383,27 +397,41 @@ const data = [
 			},
 			{
 				period: 'end',
-				name: 'parkedCrater',
-				description: 'ParkedCrater PER ROBOT',
-				displayName: 'ParkedCrater',
-				abbreviation: 'PKC',
+				name: 'level',
+				description: 'Level',
+				displayName: 'Level',
+				abbreviation: 'LVL',
+				conditions: 'TBD',
+				type: 'number',
+				value: 1,
+				validation: {
+					min: 0,
+					max: 64 //rough guess
+				}
+			},
+			{
+				period: 'end',
+				name: 'foundation',
+				description: 'Foundation',
+				displayName: 'Foundation',
+				abbreviation: 'FND',
 				conditions: 'TBD',
 				type: 'number',
 				value: 15,
 				validation: {
 					min: 0,
-					max: 2
+					max: 1
 				}
 			},
 			{
 				period: 'end',
-				name: 'parkedCompletelyCrater',
-				description: 'ParkedCompletelyCrater PER ROBOT',
-				displayName: 'ParkedCompletelyCrater',
-				abbreviation: 'PCC',
+				name: 'park',
+				description: 'Park',
+				displayName: 'Park',
+				abbreviation: 'PRK',
 				conditions: 'TBD',
 				type: 'number',
-				value: 25,
+				value: 5,
 				validation: {
 					min: 0,
 					max: 2
